@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.remind_mi">
    <application
-        android:label="remind_mi"
+        android:label="RemindMi"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
