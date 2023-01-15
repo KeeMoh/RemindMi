@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "293213021413",
+    "project_id": "remindmi-pc",
+    "storage_bucket": "remindmi-pc.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:293213021413:android:a8a9d42f1403879d2b200c",
+        "android_client_info": {
+          "package_name": "com.example.remind_mi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "293213021413-7dmlk71oan3ba0ld9und9mubgsvo4jlc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWx0dc-0GWV9oO3GPWa50mW5DL0MIudSY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "293213021413-7dmlk71oan3ba0ld9und9mubgsvo4jlc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "293213021413-t9m9092lqsbkobngfrucnh5c00jl6br3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.remindMi"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
