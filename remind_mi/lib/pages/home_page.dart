@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:remind_mi/pages/form_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -48,7 +49,21 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
               ],
-            )));
+            )),
+            floatingActionButton:   FloatingActionButton(
+                  backgroundColor: const Color.fromRGBO(248, 228, 148, 1),
+                  foregroundColor: const Color.fromRGBO(29, 36, 50, 1),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FormPage(selectedDate:DateTime.now())
+                      ),
+                    );
+                  },
+                  child: const Icon(Icons.add),
+                ),
+            );
   }
 
   Future signOut() async {

@@ -1,9 +1,6 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:remind_mi/widgets/signin_widget.dart';
-import 'package:remind_mi/widgets/signup_widget.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -113,6 +110,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         await FirebaseAuth.instance
             .sendPasswordResetEmail(email: emailController.text.trim());
         // Utils.showSnackBar('Email de réinitialisation de mot de passe envoyé');
+        // ignore: use_build_context_synchronously
         Navigator.of(context).popUntil((route) => route.isFirst);
       } on FirebaseAuthException catch (e) {
         setState(() {
