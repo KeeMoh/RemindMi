@@ -5,6 +5,8 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminder_data_source.dart';
 import 'package:remind_mi/utils/charter.dart';
+import 'package:remind_mi/widgets/add_reminder_button.dart';
+import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
 import 'package:remind_mi/widgets/calendar/calendar_month.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -34,37 +36,39 @@ class _CalendarPageState extends State<CalendarPage> {
     var data = {"calendarView": calendarView, "reminders": reminders};
 
     return Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text("Agenda"),
-          actions: [CustomMenu()],
-        ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          data["calendarView"] = CalendarView.week;
-                          print("setState");
-                          print(data);
-                        });
-                      },
-                      child: Text("Changer de format"))
-                ],
-              ),
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text("Agenda"),
+        actions: [CustomMenu()],
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: [
+                ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        data["calendarView"] = CalendarView.week;
+                        print("setState");
+                        print(data);
+                      });
+                    },
+                    child: Text("Changer de format"))
+              ],
             ),
-            Container(
-                decoration: BoxDecoration(color: Charter.secondarycolor),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: CalendarMonth(data: data),
-                )),
-          ],
-        ));
+          ),
+          Container(
+              decoration: BoxDecoration(color: Charter.secondarycolor),
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: CalendarMonth(data: data),
+              )),
+        ],
+      ),
+      floatingActionButton: const AddReminderFloatingButton(),
+    );
   }
 
   void switchCalendarView(view) {

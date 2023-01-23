@@ -8,6 +8,7 @@ import 'package:remind_mi/models/reminder_list.dart';
 import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_button.dart';
+import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
 import 'package:remind_mi/widgets/add_reminder_form.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 
@@ -140,6 +141,7 @@ class _ToDoListState extends State<ToDoList> {
           // )
         ],
       ),
+      floatingActionButton: const AddReminderFloatingButton(),
     );
   }
 }
