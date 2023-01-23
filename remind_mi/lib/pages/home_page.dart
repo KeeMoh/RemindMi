@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:remind_mi/widgets/custom_menu.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -11,6 +12,7 @@ class HomePage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text('Nous sommes content de te revoir !'),
+          actions: const [CustomMenu()],
         ),
         body: Padding(
             padding: const EdgeInsets.all(32),
@@ -25,7 +27,9 @@ class HomePage extends StatelessWidget {
                 Text(
                   user.email!,
                   style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(

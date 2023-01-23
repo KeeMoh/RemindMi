@@ -40,8 +40,8 @@ class _AddReminderButtonState extends State<AddReminderButton> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
             shadowColor: Colors.transparent,
-            backgroundColor: Charter.red,
-            foregroundColor: Charter.black,
+            backgroundColor: Charter.secondarycolor,
+            foregroundColor: Charter.primarycolor,
             elevation: 3,
             shape: RoundedRectangleBorder(
                 //to set border radius to button

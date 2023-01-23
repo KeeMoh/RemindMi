@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
 
-class Reminder {
-  String label;
-  IconData icon = Icons.delete;
-  static List<Reminder> reminders = [];
+// class Reminder {
+//   String label;
+//   IconData icon = Icons.delete;
+//   static List<Reminder> reminders = [];
 
-  Reminder(this.label);
-}
+//   Reminder(this.label);
+// }

@@ -1,7 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/models/model.dart';
+import 'package:remind_mi/models/reminder.dart';
+import 'package:remind_mi/models/reminder_list.dart';
 import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_button.dart';
@@ -16,32 +19,37 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  int cards = 5;
+  int cards = 1;
   List<Reminder> reminders = [];
 
   void updateReminderList(text) {
-    print("mise à jour !");
-    Reminder.reminders.add(Reminder(text));
     setState(() {});
     // toDoListPage.updateReminderList(text);
   }
 
-  void addReminder() {
+  void addReminder(text) {
+    DateTime startDate = DateTime.now();
+    reminders.add(Reminder(
+      userID: "", //FirebaseAuth.instance.currentUser!.uid,
+      title: text,
+      startDate: startDate,
+      endDate: startDate.add(Duration(hours: 2)),
+    ));
     setState(() {});
   }
 
   void fillReminders() {
-    for (var i = 0; i < cards; i++) reminders.add(Reminder("texte"));
+    for (var i = 0; i < cards; i++) addReminder("Mon joli titre");
   }
 
   List<Padding> get cardsWidget => reminders
       .map((element) => Padding(
             padding: EdgeInsets.only(bottom: 5),
             child: Container(
-              color: Charter.green,
+              color: Charter.secondarycolor[600],
               child: ListTile(
-                  tileColor: Charter.green,
-                  title: Text(element.label),
+                  // tileColor: Charter.secondarycolor,
+                  title: Text(element.title),
                   trailing: FloatingActionButton(
                       onPressed: () {
                         //supress actual reminder
@@ -50,7 +58,7 @@ class _ToDoListState extends State<ToDoList> {
                           reminders.remove(element);
                         });
                       },
-                      child: Icon(element.icon))),
+                      child: Icon(Icons.delete, size: 20))),
             ),
           ))
       .toList();
@@ -67,7 +75,7 @@ class _ToDoListState extends State<ToDoList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Charter.red,
+          backgroundColor: Charter.secondarycolor,
           title: Text('Liste des tâches'),
           centerTitle: true,
           actions: [CustomMenu()]),
@@ -92,7 +100,7 @@ class _ToDoListState extends State<ToDoList> {
           ),
           Expanded(
             child: Container(
-              color: Charter.background,
+              color: Charter.primarycolor,
               child: ListView(
                 children: cardsWidget,
               ),
