@@ -89,7 +89,7 @@ class _SignInWidgetState extends State<SignInWidget> {
                 fontSize: 16,
                 color: Theme.of(context).colorScheme.secondary)
               ),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => ForgotPasswordPage())),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ForgotPasswordPage())),
             ),
             const SizedBox(height: 20),
             Text(errMsg!,
