@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:remind_mi/pages/calendar_page.dart';
 import 'package:remind_mi/pages/home_page.dart';
+import 'package:remind_mi/pages/todo_list_page.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -21,7 +23,8 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const ToDoList(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
