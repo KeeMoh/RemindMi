@@ -5,6 +5,7 @@ import 'package:remind_mi/pages/form_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 
 class AddReminderFloatingButton extends StatelessWidget {
+  // final Map<String, dynamic>? data;
   const AddReminderFloatingButton({super.key});
 
   @override
@@ -15,8 +16,7 @@ class AddReminderFloatingButton extends StatelessWidget {
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-              builder: (context) => FormPage(selectedDate: DateTime.now())),
+          MaterialPageRoute(builder: (context) => FormPage()),
         );
       },
       child: const Icon(Icons.add),
