@@ -31,7 +31,7 @@ class RemindMiApp extends StatelessWidget {
         primarySwatch: Charter.secondarycolor,
         scaffoldBackgroundColor: Charter.primarycolor,
       ),
-      home: const HomePage(),
+      home: const MainPage(),
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
     );

@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
+import 'package:remind_mi/models/reminder.dart';
+import 'package:remind_mi/models/reminders.dart';
+import 'package:remind_mi/pages/todo_list_page.dart';
 
 class FormPage extends StatefulWidget {
-  final DateTime selectedDate;
-  const FormPage({super.key, required this.selectedDate});
+  final Reminder? reminder;
+  const FormPage({super.key, this.reminder});
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -16,7 +19,7 @@ class FormPage extends StatefulWidget {
 
 class _FormPageState extends State<FormPage> {
   final formKey = GlobalKey<FormBuilderState>();
-  bool isAllDay = true;
+  bool isAllDay = false;
   // bool reminding = false;
   // final isAllDay = ValueNotifier<bool>(false);
   // final user = FirebaseAuth.instance.currentUser!;
@@ -40,7 +43,7 @@ class _FormPageState extends State<FormPage> {
                     autovalidateMode: AutovalidateMode.disabled,
                     child: Column(children: [
                       FormBuilderTextField(
-                        initialValue: 'unknown',
+                        initialValue: widget.reminder?.title,
                         name: 'title',
                         style: const TextStyle(
                             fontSize: 16,
@@ -54,7 +57,7 @@ class _FormPageState extends State<FormPage> {
                         ]),
                       ),
                       FormBuilderTextField(
-                        initialValue: "no description",
+                        initialValue: widget.reminder?.description,
                         name: 'description',
                         style: const TextStyle(
                             fontSize: 16,
@@ -98,7 +101,7 @@ class _FormPageState extends State<FormPage> {
                         ],
                       ),
                       FormBuilderDateTimePicker(
-                        initialValue: beginDate(widget.selectedDate),
+                        initialValue: widget.reminder?.startDate ?? beginDate(),
                         name: 'begin_date',
                         style: isAllDay
                             ? const TextStyle(
@@ -120,7 +123,7 @@ class _FormPageState extends State<FormPage> {
                         ]),
                       ),
                       FormBuilderDateTimePicker(
-                        initialValue: endDate(widget.selectedDate),
+                        initialValue: widget.reminder?.endDate ?? endDate(),
                         name: 'end_date',
                         style: isAllDay
                             ? const TextStyle(
@@ -144,7 +147,14 @@ class _FormPageState extends State<FormPage> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          print("save data");
+                          isSavePossible(
+                                  formKey.currentState?.value, widget.reminder)
+                              ? Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      fullscreenDialog: false,
+                                      builder: (context) => const ToDoList()))
+                              : {print("missing data...")};
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(50),
@@ -165,7 +175,10 @@ class _FormPageState extends State<FormPage> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: delete,
+                        onPressed: () {
+                          delete(widget.reminder);
+                          Navigator.pop(context);
+                        },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(20),
                           backgroundColor:
@@ -191,18 +204,42 @@ class _FormPageState extends State<FormPage> {
             )));
   }
 
-  DateTime beginDate(DateTime date) {
-    return DateTime.parse(
-        DateFormat("yyyy-MM-dd").format(date) + " 00:00:00.000");
+  DateTime beginDate() {
+    return DateTime.now();
   }
 
-  DateTime endDate(DateTime date) {
-    return DateTime.parse(
-        DateFormat("yyyy-MM-dd").format(date) + " 23:59:59.999");
+  DateTime endDate() {
+    return DateTime.now().add(Duration(hours: 2));
   }
 }
 
-void delete() {
+void addReminder(formData) {
+  DateTime startDate = DateTime.now();
+  Reminders.reminders.add(Reminder(
+      userID: "", //FirebaseAuth.instance.currentUser!.uid,
+      title: formData["title"],
+      startDate: formData["begin_date"],
+      endDate: formData["end_date"],
+      description: formData["description"],
+      isAllDay: formData["all_day_long"]));
+  // setState(() {});
+}
+
+bool isSavePossible(formular, reminder) {
+  if (formular["title"] != null && formular["title"] != "") {
+    if (reminder != null) {
+      delete(reminder);
+    }
+    addReminder(formular);
+    print("save data");
+    return true;
+  }
+
+  return false;
+}
+
+void delete(reminder) {
+  // Reminders.reminders.remove(reminder);
   print("delete");
 }
 // enum recurrence {

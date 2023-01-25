@@ -1,8 +1,8 @@
 // import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:remind_mi/models/reminder.dart';
+import 'package:remind_mi/models/reminder.dart';
 
-// class ReminderList {
-//   static List<Reminder> reminders = [];
+class Reminders {
+  static List<Reminder> reminders = [];
 
 //   void addReminder(String title, DateTime startDate, DateTime endDate,
 //       [String? description, bool? allDay]) {
@@ -21,4 +21,4 @@
 //   void deleteReminder(Reminder reminder) {
 //     reminders.remove(reminder);
 //   }
-// }
+}

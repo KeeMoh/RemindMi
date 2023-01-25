@@ -2,15 +2,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
-import 'package:remind_mi/models/model.dart';
 import 'package:remind_mi/models/reminder.dart';
-import 'package:remind_mi/models/reminder_list.dart';
+import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_button.dart';
 import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
 import 'package:remind_mi/widgets/add_reminder_form.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
+import 'package:remind_mi/widgets/task_widget.dart';
 
 class ToDoList extends StatefulWidget {
   const ToDoList({super.key});
@@ -20,56 +20,79 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  int cards = 1;
-  List<Reminder> reminders = [];
+  int cards = 2;
+  List<Reminder> reminders = Reminders.reminders;
 
-  void updateReminderList(text) {
-    setState(() {});
-    // toDoListPage.updateReminderList(text);
-  }
+  // void updateReminderList(text) {
+  //   setState(() {});
+  //   // toDoListPage.updateReminderList(text);
+  // }
 
-  void addReminder(text) {
-    DateTime startDate = DateTime.now();
-    reminders.add(Reminder(
-      userID: "", //FirebaseAuth.instance.currentUser!.uid,
-      title: text,
-      startDate: startDate,
-      endDate: startDate.add(Duration(hours: 2)),
-    ));
-    setState(() {});
-  }
+  // void addReminder(text) {
+  //   DateTime startDate = DateTime.now();
+  //   reminders.add(Reminder(
+  //     userID: "", //FirebaseAuth.instance.currentUser!.uid,
+  //     title: text,
+  //     startDate: startDate,
+  //     endDate: startDate.add(Duration(hours: 2)),
+  //   ));
+  //   setState(() {});
+  // }
 
-  void fillReminders() {
-    for (var i = 0; i < cards; i++) addReminder("Mon joli titre");
-  }
+  // void fillReminders() {
+  //   for (var i = 0; i < cards; i++)
+  //     addReminder(
+  //         "Mon joli titre, Le bouton d'a côté il fait rien, il manque la page édition. Mon joli titre, Le bouton d'a côté il fait rien, il manque la page édition.");
+  // }
 
-  List<Padding> get cardsWidget => reminders
-      .map((element) => Padding(
-            padding: EdgeInsets.only(bottom: 5),
-            child: Container(
-              color: Charter.secondarycolor[600],
-              child: ListTile(
-                  // tileColor: Charter.secondarycolor,
-                  title: Text(element.title),
-                  trailing: FloatingActionButton(
-                      onPressed: () {
-                        //supress actual reminder
-                        //reminders.add(Reminder(_controller.text));
-                        setState(() {
-                          reminders.remove(element);
-                        });
-                      },
-                      child: Icon(Icons.delete, size: 20))),
-            ),
-          ))
-      .toList();
+  get cardsWidget => reminders.isEmpty
+      ? const Center(
+          child: Text(
+            "Vous n'avez pas de tâches à venir ...",
+            style: TextStyle(color: Charter.white),
+          ),
+        )
+      : const ReminderWidget();
+  // reminders
+  //     .map((element) => Padding(
+  //           padding: EdgeInsets.only(bottom: 5),
+  //           child: Container(
+  //             color: Charter.secondarycolor[600],
+  //             child: Row(
+  //               children: [
+  //                 Expanded(child: Text(element.title)),
+  //                 FloatingActionButton(
+  //                     backgroundColor: Charter.secondarycolor,
+  //                     mini: true,
+  //                     onPressed: () {
+  //                       //TODO UPDATE EVENT
+  //                       print(
+  //                           "Le bouton fait rien, il manque la page édition.");
+  //                     },
+  //                     child: Icon(Icons.edit, size: 20)),
+  //                 FloatingActionButton(
+  //                     backgroundColor: Color.fromARGB(170, 255, 55, 0),
+  //                     mini: true,
+  //                     onPressed: () {
+  //                       //supress actual reminder
+  //                       //reminders.add(Reminder(_controller.text));
+  //                       setState(() {
+  //                         reminders.remove(element);
+  //                       });
+  //                     },
+  //                     child: Icon(Icons.delete, size: 20)),
+  //               ],
+  //             ),
+  //           ),
+  //         ))
+  //     .toList();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // _controller = TextEditingController();
-    fillReminders();
+    // fillReminders();
   }
 
   @override
@@ -95,17 +118,9 @@ class _ToDoListState extends State<ToDoList> {
           // ),
           // ),
           // ),
-          Padding(
-            padding: const EdgeInsets.all(15.0),
-            child: AddReminderButton(),
-          ),
+          SizedBox(height: 10),
           Expanded(
-            child: Container(
-              color: Charter.primarycolor,
-              child: ListView(
-                children: cardsWidget,
-              ),
-            ),
+            child: Container(color: Charter.primarycolor, child: cardsWidget),
           )
           // Container(
           //   color: Colors.blue,
@@ -141,7 +156,7 @@ class _ToDoListState extends State<ToDoList> {
           // )
         ],
       ),
-      floatingActionButton: const AddReminderFloatingButton(),
+      floatingActionButton: const AddReminderButton(),
     );
   }
 }
