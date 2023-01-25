@@ -4,6 +4,7 @@ import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminder_data_source.dart';
+import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_button.dart';
 import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
@@ -26,7 +27,7 @@ class _CalendarPageState extends State<CalendarPage> {
   void initState() {
     print("initState");
     calendarView = CalendarView.month;
-    reminders = ReminderDataSource(_getDataSource());
+    reminders = ReminderDataSource(Reminders.reminders);
     super.initState();
   }
 
@@ -34,7 +35,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     // final get calendarView{}
     var data = {"calendarView": calendarView, "reminders": reminders};
-
+    CalendarMonth calendarMonth;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
@@ -59,12 +60,7 @@ class _CalendarPageState extends State<CalendarPage> {
               ],
             ),
           ),
-          Container(
-              decoration: BoxDecoration(color: Charter.secondarycolor),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CalendarMonth(data: data),
-              )),
+          CalendarMonth(data: data),
         ],
       ),
       floatingActionButton: const AddReminderFloatingButton(),
@@ -76,38 +72,38 @@ class _CalendarPageState extends State<CalendarPage> {
     setState(() {});
   }
 
-  List<Reminder> _getDataSource() {
-    final List<Reminder> reminders = <Reminder>[];
-    final DateTime today = DateTime.now();
-    final DateTime startDate = DateTime(today.year, today.month, today.day, 9);
-    final DateTime endDate = startDate.add(const Duration(hours: 2));
-    reminders.add(Reminder(
-        userID: "", //FirebaseAuth.instance.currentUser!.uid
-        title: 'Conference',
-        startDate: startDate,
-        endDate: endDate));
-    return reminders;
-  }
+  // List<Reminder> _getDataSource() {
+  //   final List<Reminder> reminders = <Reminder>[];
+  //   final DateTime today = DateTime.now();
+  //   final DateTime startDate = DateTime(today.year, today.month, today.day, 9);
+  //   final DateTime endDate = startDate.add(const Duration(hours: 2));
+  //   reminders.add(Reminder(
+  //       userID: "", //FirebaseAuth.instance.currentUser!.uid
+  //       title: 'Conference',
+  //       startDate: startDate,
+  //       endDate: endDate));
+  //   return reminders;
+  // }
 }
 
 /// Custom business object class which contains properties to hold the detailed
 /// information about the event data which will be rendered in calendar.
-class Meeting {
-  /// Creates a meeting class with required details.
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
+// class Meeting {
+//   /// Creates a meeting class with required details.
+//   Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
 
-  /// Event name which is equivalent to subject property of [Appointment].
-  String eventName;
+//   /// Event name which is equivalent to subject property of [Appointment].
+//   String eventName;
 
-  /// From which is equivalent to start time property of [Appointment].
-  DateTime from;
+//   /// From which is equivalent to start time property of [Appointment].
+//   DateTime from;
 
-  /// To which is equivalent to end time property of [Appointment].
-  DateTime to;
+//   /// To which is equivalent to end time property of [Appointment].
+//   DateTime to;
 
-  /// Background which is equivalent to color property of [Appointment].
-  Color background;
+//   /// Background which is equivalent to color property of [Appointment].
+//   Color background;
 
-  /// IsAllDay which is equivalent to isAllDay property of [Appointment].
-  bool isAllDay;
-}
+//   /// IsAllDay which is equivalent to isAllDay property of [Appointment].
+//   bool isAllDay;
+// }
