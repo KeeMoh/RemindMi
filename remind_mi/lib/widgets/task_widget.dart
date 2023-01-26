@@ -39,7 +39,7 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                           MaterialPageRoute(
                               fullscreenDialog: false,
                               builder: (context) => FormPage(
-                                    docReference: element.ref,
+                                    reminder: element,
                                   ))),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -52,30 +52,33 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                         ),
                       ),
                     )),
-                    FloatingActionButton(
-                        backgroundColor: Charter.secondarycolor,
-                        mini: true,
+                    IconButton(
+                        key: const ValueKey('editButton'),
+                        // backgroundColor: Charter.secondarycolor,
+                        // mini: true,
                         onPressed: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   fullscreenDialog: false,
                                   builder: (context) => FormPage(
-                                        docReference: element.ref,
+                                        reminder: element,
                                       )));
                         },
-                        child: const Icon(Icons.edit, size: 20)),
-                    FloatingActionButton(
-                        backgroundColor: Color.fromARGB(170, 255, 55, 0),
-                        mini: true,
+                        icon: const Icon(Icons.edit, size: 20)),
+                    IconButton(
+                        // backgroundColor: Color.fromARGB(170, 255, 55, 0),
+                        // mini: true,
+                        key: const ValueKey('deleteButton'),
                         onPressed: () {
                           //supress actual reminder
                           //reminders.add(Reminder(_controller.text));
+                          element.delete();
                           setState(() {
                             reminders.remove(element);
                           });
                         },
-                        child: const Icon(Icons.delete, size: 20)),
+                        icon: const Icon(Icons.delete, size: 20)),
                   ],
                 ),
               ),

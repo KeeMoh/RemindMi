@@ -11,8 +11,8 @@ import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/utils/hex_color.dart';
 
 class FormPage extends StatefulWidget {
-  final DocumentReference? docReference;
-  const FormPage({super.key, this.docReference});
+  final Reminder? reminder;
+  const FormPage({super.key, this.reminder});
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -21,7 +21,7 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final formKey = GlobalKey<FormBuilderState>();
   final user = FirebaseAuth.instance.currentUser!;
-  Reminder? reminder;
+  // Reminder? reminder;
   bool isAllDay = false;
   List<String> availableColors = [
     "FF4CAF50",
@@ -34,21 +34,21 @@ class _FormPageState extends State<FormPage> {
     "FFFFEB3B"
   ];
 
-  void init() async {
-    print("init form 1 : " + widget.docReference.toString());
-    if (widget.docReference != null) {
-      print("init form 2 : " + widget.docReference.toString());
-      final reminder = await readReminder(widget.docReference!);
-      setState(() {
-        this.reminder = reminder;
-      });
-    }
-  }
+  // void init() async {
+  //   print("init form 1 : " + widget.reminder.toString());
+  //   if (widget.reminder != null) {
+  //     print("init form 2 : " + widget.reminder.toString());
+  //     final reminder = await readReminder(widget.reminder!);
+  //     setState(() {
+  //       this.reminder = reminder;
+  //     });
+  //   }
+  // }
 
   @override
   void initState() {
     super.initState();
-    init();
+    // init();
   }
 
   @override
@@ -68,7 +68,7 @@ class _FormPageState extends State<FormPage> {
                 autovalidateMode: AutovalidateMode.disabled,
                 child: ListView(children: [
                   FormBuilderTextField(
-                    initialValue: reminder?.title,
+                    initialValue: widget.reminder?.title,
                     name: 'title',
                     style: const TextStyle(
                         fontSize: 16, color: Color.fromRGBO(248, 228, 148, 1)),
@@ -81,7 +81,7 @@ class _FormPageState extends State<FormPage> {
                     ]),
                   ),
                   FormBuilderTextField(
-                    initialValue: reminder?.description,
+                    initialValue: widget.reminder?.description,
                     name: 'description',
                     style: const TextStyle(
                         fontSize: 16, color: Color.fromRGBO(248, 228, 148, 1)),
@@ -123,7 +123,7 @@ class _FormPageState extends State<FormPage> {
                     ],
                   ),
                   FormBuilderDateTimePicker(
-                    initialValue: reminder?.startDate ?? beginDate(),
+                    initialValue: widget.reminder?.startDate ?? beginDate(),
                     name: 'begin_date',
                     style: isAllDay
                         ? const TextStyle(
@@ -145,7 +145,7 @@ class _FormPageState extends State<FormPage> {
                     ]),
                   ),
                   FormBuilderDateTimePicker(
-                    initialValue: reminder?.endDate ?? endDate(),
+                    initialValue: widget.reminder?.endDate ?? endDate(),
                     name: 'end_date',
                     style: isAllDay
                         ? const TextStyle(
@@ -192,8 +192,8 @@ class _FormPageState extends State<FormPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
-                      await saveReminder(widget.docReference?.id,
-                          formKey.currentState?.value, reminder);
+                      await saveReminder(
+                          formKey.currentState?.value, widget.reminder);
                       Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => const ToDoList(),
                       ));
@@ -218,7 +218,7 @@ class _FormPageState extends State<FormPage> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      delete(context, widget.docReference?.id);
+                      widget.reminder?.delete();
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
@@ -251,14 +251,15 @@ class _FormPageState extends State<FormPage> {
   }
 }
 
-Future saveReminder(docId, formular, reminder) async {
+Future saveReminder(formular, reminder) async {
   if (formular["title"] != null && formular["title"] != "") {
-    if (docId != null) {
+    String? id = reminder?.ref?.id;
+    if (id != null) {
       final docReminder = FirebaseFirestore.instance
           .collection('reminder_collection')
           .doc(FirebaseAuth.instance.currentUser!.uid)
           .collection('reminders')
-          .doc(docId);
+          .doc(id);
 
       final reminder = Reminder(
           title: formular["title"],
@@ -297,14 +298,6 @@ Future saveReminder(docId, formular, reminder) async {
         print(e);
       }
     }
-  }
-}
-
-void delete(context, docId) {
-  if (docId != null) {
-    print("delete " + docId);
-  } else {
-    Navigator.of(context).pop();
   }
 }
 
