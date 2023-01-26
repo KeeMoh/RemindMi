@@ -1,8 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:remind_mi/pages/calendar_page.dart';
-import 'package:remind_mi/pages/home_page.dart';
-import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/pages/main_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 
@@ -10,7 +6,7 @@ final navigatorKey = GlobalKey<NavigatorState>();
 
 // ignore: must_be_immutable
 class RemindMiApp extends StatelessWidget {
-  RemindMiApp({super.key});
+  const RemindMiApp({super.key});
 
   // This widget is the root of your application.
   @override

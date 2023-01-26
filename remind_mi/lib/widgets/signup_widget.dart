@@ -162,8 +162,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-        navigatorKey.currentState!.popUntil((route) => route.isFirst);
-        
       } on FirebaseAuthException catch (e) {
         print(e);
 
@@ -173,6 +171,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
           errMsg = e.message;
         });
       }
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
     }
   }
 }

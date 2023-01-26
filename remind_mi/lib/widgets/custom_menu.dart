@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:remind_mi/pages/calendar_page.dart';
 import 'package:remind_mi/pages/config_page.dart';
-import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 
@@ -56,6 +55,22 @@ class CustomMenu extends StatelessWidget {
                       child: Row(
                         children: const [
                           Icon(Icons.settings, color: Charter.red),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Text("Compte")
+                        ],
+                      ))),
+              PopupMenuItem(
+                  child: GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const ConfigPage(),
+                            ),
+                          ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.star, color: Charter.red),
                           SizedBox(
                             width: 10,
                           ),

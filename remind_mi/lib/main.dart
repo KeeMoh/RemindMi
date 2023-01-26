@@ -6,5 +6,5 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  runApp(RemindMiApp());
+  runApp(const RemindMiApp());
 }

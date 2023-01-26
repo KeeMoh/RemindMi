@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/form_page.dart';
@@ -22,6 +19,7 @@ class _ReminderWidgetState extends State<ReminderWidget> {
       .map((element) => element.endDate.isBefore(DateTime.now())
           ? const SizedBox()
           : Padding(
+              key: ValueKey(element.ref?.id),
               padding: EdgeInsets.only(bottom: 5),
               child: Container(
                 color: HexColor(element.background),
@@ -40,8 +38,9 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                           context,
                           MaterialPageRoute(
                               fullscreenDialog: false,
-                              builder: (context) =>
-                                  FormPage(reminder: element))),
+                              builder: (context) => FormPage(
+                                    docReference: element.ref,
+                                  ))),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
@@ -61,8 +60,9 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                               context,
                               MaterialPageRoute(
                                   fullscreenDialog: false,
-                                  builder: (context) =>
-                                      FormPage(reminder: element)));
+                                  builder: (context) => FormPage(
+                                        docReference: element.ref,
+                                      )));
                         },
                         child: const Icon(Icons.edit, size: 20)),
                     FloatingActionButton(

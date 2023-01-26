@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:remind_mi/models/reminder_data_source.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/utils/charter.dart';
-import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
+import 'package:remind_mi/widgets/add_reminder_floating_button.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
