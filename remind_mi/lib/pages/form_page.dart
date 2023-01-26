@@ -1,10 +1,11 @@
 // ignore_for_file: prefer_interpolation_to_compose_strings
 
 // import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:intl/intl.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
@@ -19,6 +20,7 @@ class FormPage extends StatefulWidget {
 
 class _FormPageState extends State<FormPage> {
   final formKey = GlobalKey<FormBuilderState>();
+  final user = FirebaseAuth.instance.currentUser!;
   bool isAllDay = false;
   // bool reminding = false;
   // final isAllDay = ValueNotifier<bool>(false);
@@ -147,14 +149,8 @@ class _FormPageState extends State<FormPage> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          isSavePossible(
-                                  formKey.currentState?.value, widget.reminder)
-                              ? Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      fullscreenDialog: false,
-                                      builder: (context) => const ToDoList()))
-                              : {print("missing data...")};
+                          saveEvent(
+                              formKey.currentState?.value, widget.reminder);
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(50),
@@ -213,35 +209,43 @@ class _FormPageState extends State<FormPage> {
   }
 }
 
-void addReminder(formData) {
-  DateTime startDate = DateTime.now();
-  Reminders.reminders.add(Reminder(
-      userID: "", //FirebaseAuth.instance.currentUser!.uid,
-      title: formData["title"],
-      startDate: formData["begin_date"],
-      endDate: formData["end_date"],
-      description: formData["description"],
-      isAllDay: formData["all_day_long"]));
-  // setState(() {});
-}
-
-bool isSavePossible(formular, reminder) {
+Future saveEvent(formular, reminder) async {
   if (formular["title"] != null && formular["title"] != "") {
     if (reminder != null) {
       delete(reminder);
-    }
-    addReminder(formular);
-    print("save data");
-    return true;
-  }
+    } else {
+      try {
+        final newEvent = FirebaseFirestore.instance
+            .collection('event_collection')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .collection('event');
 
-  return false;
+        final reminder = Reminder(
+            title: formular["title"],
+            startDate: formular["begin_date"],
+            endDate: formular["end_date"],
+            description: formular["description"],
+            reminder: formular["reminder"],
+            recurrence: formular["recurrence"],
+            color: formular["color"],
+            isAllDay: formular["all_day_long"]);
+
+        final json = reminder.toJson();
+        await newEvent.add(json);
+      } on FirebaseAuthException catch (e) {
+        print(e);
+      }
+    }
+  }
+// Navigator.push(
+//                                   context,
+//                                   MaterialPageRoute(
+//                                       fullscreenDialog: false,
+//                                       builder: (context) => const ToDoList()))
+//   return false;
 }
 
 void delete(reminder) {
   // Reminders.reminders.remove(reminder);
   print("delete");
 }
-// enum recurrence {
-//   Jamais,
-// }

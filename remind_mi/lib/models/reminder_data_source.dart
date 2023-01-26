@@ -27,10 +27,10 @@ class ReminderDataSource extends CalendarDataSource {
     return _getReminderData(index).title;
   }
 
-  @override
-  Color getColor(int index) {
-    return _getReminderData(index).background;
-  }
+  // @override
+  // Color getColor(int index) {
+  //   return _getReminderData(index).background;
+  // }
 
   @override
   bool isAllDay(int index) {

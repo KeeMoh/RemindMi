@@ -26,7 +26,7 @@ class _CalendarMonthState extends State<CalendarMonth> {
       // width: screenWidth,
       child: SfCalendar(
         view: CalendarView.week,
-        allowedViews: [
+        allowedViews: const [
           CalendarView.day,
           CalendarView.week,
           // CalendarView.workWeek,

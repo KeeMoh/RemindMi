@@ -1,13 +1,7 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminder_data_source.dart';
 import 'package:remind_mi/models/reminders.dart';
-import 'package:remind_mi/utils/charter.dart';
-import 'package:remind_mi/widgets/add_reminder_button.dart';
-import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
+import 'package:remind_mi/widgets/add_reminder_floating_button.dart';
 import 'package:remind_mi/widgets/calendar/calendar_month.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
@@ -35,12 +29,11 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     // final get calendarView{}
     var data = {"calendarView": calendarView, "reminders": reminders};
-    CalendarMonth calendarMonth;
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text("Agenda"),
-        actions: [CustomMenu()],
+        title: const Text("Agenda"),
+        actions: const [CustomMenu()],
       ),
       body: Column(
         children: [
@@ -56,7 +49,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         print(data);
                       });
                     },
-                    child: Text("Changer de format"))
+                    child: const Text("Changer de format"))
               ],
             ),
           ),

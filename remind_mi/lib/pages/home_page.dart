@@ -1,10 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:remind_mi/utils/charter.dart';
-import 'package:remind_mi/widgets/add_reminder_button.dart';
-import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
+import 'package:remind_mi/widgets/add_reminder_floating_button.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
-import 'package:remind_mi/pages/form_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -15,7 +12,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Nous sommes content de te revoir !'),
+          title: const Center(child: Text('Accueil')),
           actions: const [CustomMenu()],
         ),
         body: Padding(

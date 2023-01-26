@@ -23,18 +23,18 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: StreamBuilder<User?>(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return const Center(child: Text('Une erreur est survenue'));
-        } else if (snapshot.hasData) {
-          return const HomePage();
-        } else {
-          return const AuthPage();
-        }
-      }),
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return const Center(child: Text('Une erreur est survenue'));
+            } else if (snapshot.hasData) {
+              return const HomePage();
+            } else {
+              return const AuthPage();
+            }
+          }),
     );
   }
 }
