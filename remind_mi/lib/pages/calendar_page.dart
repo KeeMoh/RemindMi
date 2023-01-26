@@ -19,7 +19,6 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   void initState() {
-    print("initState");
     calendarView = CalendarView.month;
     reminders = ReminderDataSource(Reminders.reminders);
     super.initState();

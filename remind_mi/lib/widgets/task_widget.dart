@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminders.dart';
@@ -5,17 +7,15 @@ import 'package:remind_mi/pages/form_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 
 class ReminderWidget extends StatefulWidget {
-  final List<Reminder> listEvents;
-  const ReminderWidget({super.key, required this.listEvents});
+  const ReminderWidget({super.key});
 
   @override
   State<ReminderWidget> createState() => _ReminderWidgetState();
 }
 
 class _ReminderWidgetState extends State<ReminderWidget> {
-  get cardsWidget => widget.listEvents
-      .map((element) => 
-            Padding(
+  get cardsWidget => Reminders.reminders
+      .map((element) => Padding(
             padding: const EdgeInsets.only(bottom: 5),
             child: Container(
               color: Charter.secondarycolor[600],
@@ -30,8 +30,9 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                             context,
                             MaterialPageRoute(
                                 fullscreenDialog: false,
-                                builder: (context) =>
-                                    FormPage(reminder: element)));
+                                builder: (context) => FormPage(
+                                      docReference: element.ref,
+                                    )));
                       },
                       child: const Icon(Icons.edit, size: 20)),
                   FloatingActionButton(
@@ -40,7 +41,7 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                       onPressed: () {
                         //supress actual reminder
                         //reminders.add(Reminder(_controller.text));
-                        deleteEvent();
+                        element.delete();
                       },
                       child: const Icon(Icons.delete, size: 20)),
                 ],
@@ -51,13 +52,8 @@ class _ReminderWidgetState extends State<ReminderWidget> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.listEvents);
     return ListView(
       children: cardsWidget,
     );
   }
-}
-
-Future deleteEvent() async {
-  print("delete");
 }

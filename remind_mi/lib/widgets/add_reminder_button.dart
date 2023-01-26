@@ -44,11 +44,11 @@ class _AddReminderButtonState extends State<AddReminderButton> {
                 borderRadius: BorderRadius.circular(30)),
             padding: const EdgeInsets.all(5)),
         onPressed: () {
+          print("here");
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  fullscreenDialog: false,
-                  builder: (context) => const FormPage()));
+            context,
+            MaterialPageRoute(builder: (context) => const FormPage()),
+          );
         },
         child: const Center(
             child: Text(

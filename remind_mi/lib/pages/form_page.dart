@@ -7,12 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:remind_mi/models/reminder.dart';
-import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
 
 class FormPage extends StatefulWidget {
-  final Reminder? reminder;
-  const FormPage({super.key, this.reminder});
+  final DocumentReference? docReference;
+  const FormPage({super.key, this.docReference});
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -21,10 +20,28 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final formKey = GlobalKey<FormBuilderState>();
   final user = FirebaseAuth.instance.currentUser!;
+  Reminder? reminder;
   bool isAllDay = false;
   // bool reminding = false;
   // final isAllDay = ValueNotifier<bool>(false);
   // final user = FirebaseAuth.instance.currentUser!;
+
+  void init() async {
+    print("init form 1 : "+ widget.docReference.toString());
+    if (widget.docReference != null) {
+      print("init form 2");
+      final reminder = await readReminder(widget.docReference!);
+      setState(() {
+        this.reminder = reminder;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +62,7 @@ class _FormPageState extends State<FormPage> {
                     autovalidateMode: AutovalidateMode.disabled,
                     child: Column(children: [
                       FormBuilderTextField(
-                        initialValue: widget.reminder?.title,
+                        initialValue: reminder?.title,
                         name: 'title',
                         style: const TextStyle(
                             fontSize: 16,
@@ -59,7 +76,7 @@ class _FormPageState extends State<FormPage> {
                         ]),
                       ),
                       FormBuilderTextField(
-                        initialValue: widget.reminder?.description,
+                        initialValue: reminder?.description,
                         name: 'description',
                         style: const TextStyle(
                             fontSize: 16,
@@ -103,7 +120,7 @@ class _FormPageState extends State<FormPage> {
                         ],
                       ),
                       FormBuilderDateTimePicker(
-                        initialValue: widget.reminder?.startDate ?? beginDate(),
+                        initialValue: reminder?.startDate ?? beginDate(),
                         name: 'begin_date',
                         style: isAllDay
                             ? const TextStyle(
@@ -125,7 +142,7 @@ class _FormPageState extends State<FormPage> {
                         ]),
                       ),
                       FormBuilderDateTimePicker(
-                        initialValue: widget.reminder?.endDate ?? endDate(),
+                        initialValue: reminder?.endDate ?? endDate(),
                         name: 'end_date',
                         style: isAllDay
                             ? const TextStyle(
@@ -148,9 +165,12 @@ class _FormPageState extends State<FormPage> {
                       ),
                       const SizedBox(height: 20),
                       ElevatedButton(
-                        onPressed: () {
-                          saveEvent(
-                              formKey.currentState?.value, widget.reminder);
+                        onPressed: () async {
+                          await saveReminder(widget.docReference?.id,
+                              formKey.currentState?.value, reminder);
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const ToDoList(),
+                          ));
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: const Size.fromHeight(50),
@@ -172,7 +192,7 @@ class _FormPageState extends State<FormPage> {
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
-                          delete(widget.reminder);
+                          delete(context, widget.docReference?.id);
                           Navigator.pop(context);
                         },
                         style: ElevatedButton.styleFrom(
@@ -209,16 +229,35 @@ class _FormPageState extends State<FormPage> {
   }
 }
 
-Future saveEvent(formular, reminder) async {
+Future saveReminder(docId, formular, reminder) async {
   if (formular["title"] != null && formular["title"] != "") {
-    if (reminder != null) {
-      delete(reminder);
+    if (docId != null) {
+      final docReminder = FirebaseFirestore.instance
+          .collection('reminder_collection')
+          .doc(FirebaseAuth.instance.currentUser!.uid)
+          .collection('reminders')
+          .doc(docId);
+
+      final reminder = Reminder(
+          title: formular["title"],
+          startDate: formular["begin_date"],
+          endDate: formular["end_date"],
+          description: formular["description"],
+          reminder: formular["reminder"],
+          recurrence: formular["recurrence"],
+          color: formular["color"],
+          isAllDay: formular["all_day_long"]);
+
+      final json = reminder.toJson();
+
+      docReminder.update(json);
+// }
     } else {
       try {
-        final newEvent = FirebaseFirestore.instance
-            .collection('event_collection')
+        final listReminders = FirebaseFirestore.instance
+            .collection('reminder_collection')
             .doc(FirebaseAuth.instance.currentUser!.uid)
-            .collection('event');
+            .collection('reminders');
 
         final reminder = Reminder(
             title: formular["title"],
@@ -231,7 +270,7 @@ Future saveEvent(formular, reminder) async {
             isAllDay: formular["all_day_long"]);
 
         final json = reminder.toJson();
-        await newEvent.add(json);
+        await listReminders.add(json);
       } on FirebaseAuthException catch (e) {
         print(e);
       }
@@ -245,7 +284,29 @@ Future saveEvent(formular, reminder) async {
 //   return false;
 }
 
-void delete(reminder) {
+void delete(context, docId) {
   // Reminders.reminders.remove(reminder);
-  print("delete");
+  if (docId != null) {
+    print("delete " + docId);
+  } else {
+    Navigator.of(context).pop();
+  }
+}
+
+Future<Reminder?> readReminder(DocumentReference ref) async {
+  final docReminder = FirebaseFirestore.instance
+      .collection('reminder_collection')
+      .doc(FirebaseAuth.instance.currentUser!.uid)
+      .collection('reminders')
+      .doc(ref.id);
+
+  final snapshot = await docReminder.get();
+
+  print(snapshot);
+
+  if (snapshot.exists) {
+    return Reminder.fromJson(snapshot.data()!, ref: snapshot.reference);
+  } else {
+    return null;
+  }
 }

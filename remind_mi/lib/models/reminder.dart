@@ -1,26 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/animation.dart';
-import 'package:flutter/material.dart';
 
 class Reminder {
+  DocumentReference? ref;
+  String title;
+  DateTime startDate;
+  DateTime endDate;
   String? description;
   DateTime? reminder;
   String? recurrence;
   String? color;
-  String title;
-  //which is equivalent to subject property of [Appointment].
-  DateTime startDate;
-  // which is equivalent to start time property of [Appointment].
-  DateTime endDate;
-  //which is equivalent to end time property of [Appointment].
-  // Color background;
-  //which is equivalent to color property of [Appointment].
   bool isAllDay;
-  //which is equivalent to isAllDay property of [Appointment].
 
   Reminder(
-      {required this.title,
+      {this.ref,
+      required this.title,
       required this.startDate,
       required this.endDate,
       this.description,
@@ -42,15 +35,25 @@ class Reminder {
         'isAllDay': isAllDay,
       };
 
-  static Reminder fromJson(Map<String, dynamic> json) => Reminder(
+  static Reminder fromJson(Map<String, dynamic> json,
+          {required DocumentReference ref}) =>
+      Reminder(
+        ref: ref,
         title: json['title'],
         description: json['description'],
-        startDate: (json['startDate'] as Timestamp).toDate(),
-        endDate: (json['endDate'] as Timestamp).toDate(),
-        reminder: (json['reminder'] as Timestamp).toDate(),
+        startDate: DateTime.parse(json['startDate'].toDate().toString()),
+        endDate: DateTime.parse(json['endDate'].toDate().toString()),
+        reminder: json['reminder'] == null
+            ? null
+            : DateTime.parse(json['reminder'].toDate().toString()),
         recurrence: json['recurrence'],
         color: json['color'],
         // background: json['background'],
         isAllDay: json['isAllDay'],
       );
+
+  void delete() {
+    ref?.delete();
+  }
+
 }

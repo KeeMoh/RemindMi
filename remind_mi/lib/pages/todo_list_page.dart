@@ -30,22 +30,23 @@ class _ToDoListState extends State<ToDoList> {
           centerTitle: true,
           actions: const [CustomMenu()]),
       body: StreamBuilder<List<Reminder>>(
-          stream: readEvents(),
+          stream: readReminders(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Une erreur est survenue ! ${snapshot.error}');
             } else if (snapshot.hasData) {
-              final events = snapshot.data!;
-              return ReminderWidget(listEvents: events);
-              //return ListView(children: events.map(buildEvents).toList());
+              final reminders = snapshot.data!;
+              Reminders.reminders = reminders;
+              return (Reminders.reminders.isEmpty)
+                  ? const Center(
+                      child: Text(
+                        "Vous n'avez pas de tâches à venir ...",
+                        style: TextStyle(color: Charter.white),
+                      ),
+                    )
+                  : (const ReminderWidget());
             } else {
               return const Center(child: CircularProgressIndicator());
-              // return const Center(
-              //   child: Text(
-              //     "Vous n'avez pas de tâches à venir ...",
-              //     style: TextStyle(color: Charter.white),
-              //   ),
-              // );
             }
           }),
       floatingActionButton: const AddReminderButton(),
@@ -53,39 +54,11 @@ class _ToDoListState extends State<ToDoList> {
   }
 }
 
-Stream<List<Reminder>> readEvents() => FirebaseFirestore.instance
-    .collection('users')
+Stream<List<Reminder>> readReminders() => FirebaseFirestore.instance
+    .collection('reminder_collection')
     .doc(FirebaseAuth.instance.currentUser!.uid)
-    .collection('event')
+    .collection('reminders')
     .snapshots()
-    .map((snapshot) =>
-        snapshot.docs.map((doc) => Reminder.fromJson(doc.data())).toList());
-
-// Future<Reminder?> readEvent() async {
-//   final docEvent = FirebaseFirestore.instance
-//     .collection('users')
-//     .doc(FirebaseAuth.instance.currentUser!.uid)
-//     .collection('event')
-//     .snapshots()
-//     .map((snapshot) =>
-//         snapshot.docs.map((doc) => Reminder.fromJson(doc.data())).toList())};
-
-// Future<Reminder?> updateEvent() async {
-//   final docEvent = FirebaseFirestore.instance
-//       .collection('users')
-//       .doc(FirebaseAuth.instance.currentUser!.uid)
-//       .collection('event')
-//       .doc("id_of_my_doc");
-
-//   docEvent.update({'title': 'newTitle'});
-// }
-//
-//// Future<Reminder?> deleteEvent() async {
-//   final docEvent = FirebaseFirestore.instance
-//       .collection('users')
-//       .doc(FirebaseAuth.instance.currentUser!.uid)
-//       .collection('event')
-//       .doc("id_of_my_doc");
-
-//   docEvent.delete();
-// }
+    .map((snapshot) => snapshot.docs
+        .map((doc) => Reminder.fromJson(doc.data(), ref: doc.reference))
+        .toList());
