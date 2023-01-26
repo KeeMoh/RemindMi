@@ -1,7 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/form_page.dart';
 import 'package:remind_mi/utils/charter.dart';
@@ -16,6 +13,7 @@ class ReminderWidget extends StatefulWidget {
 class _ReminderWidgetState extends State<ReminderWidget> {
   get cardsWidget => Reminders.reminders
       .map((element) => Padding(
+            key: ValueKey(element.ref?.id),
             padding: const EdgeInsets.only(bottom: 5),
             child: Container(
               color: Charter.secondarycolor[600],

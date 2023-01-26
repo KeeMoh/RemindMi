@@ -8,7 +8,7 @@ class Reminder {
   String? description;
   DateTime? reminder;
   String? recurrence;
-  String? color;
+  String? background;
   bool isAllDay;
 
   Reminder(
@@ -19,8 +19,7 @@ class Reminder {
       this.description,
       this.reminder,
       this.recurrence,
-      this.color,
-      // this.background = const Color(0xFF0F8644),
+      required this.background,
       this.isAllDay = false});
 
   Map<String, dynamic> toJson() => {
@@ -30,7 +29,7 @@ class Reminder {
         'endDate': endDate,
         'reminder': reminder,
         'recurrence': recurrence,
-        'color': color,
+        'background': background,
         // 'background': background,
         'isAllDay': isAllDay,
       };
@@ -47,7 +46,7 @@ class Reminder {
             ? null
             : DateTime.parse(json['reminder'].toDate().toString()),
         recurrence: json['recurrence'],
-        color: json['color'],
+        background: json['background'],
         // background: json['background'],
         isAllDay: json['isAllDay'],
       );
@@ -55,5 +54,4 @@ class Reminder {
   void delete() {
     ref?.delete();
   }
-
 }

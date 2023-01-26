@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -19,8 +17,6 @@ class _CalendarMonthState extends State<CalendarMonth> {
 
   @override
   Widget build(BuildContext context) {
-    CalendarView view = widget.data['calendarView'];
-    double screenWidth = MediaQuery.of(context).size.width;
     return Expanded(
       // height: screenWidth,
       // width: screenWidth,

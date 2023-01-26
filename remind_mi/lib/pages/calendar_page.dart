@@ -44,8 +44,6 @@ class _CalendarPageState extends State<CalendarPage> {
                     onPressed: () {
                       setState(() {
                         data["calendarView"] = CalendarView.week;
-                        print("setState");
-                        print(data);
                       });
                     },
                     child: const Text("Changer de format"))

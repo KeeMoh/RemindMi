@@ -18,7 +18,6 @@ class _AddReminderButtonState extends State<AddReminderButton> {
   void dispose() {
     _controller.dispose();
     super.dispose();
-    setState(() {});
   }
 
   // void updateReminderList(text) {
@@ -44,7 +43,6 @@ class _AddReminderButtonState extends State<AddReminderButton> {
                 borderRadius: BorderRadius.circular(30)),
             padding: const EdgeInsets.all(5)),
         onPressed: () {
-          print("here");
           Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => const FormPage()),

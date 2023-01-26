@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/pages/main_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
