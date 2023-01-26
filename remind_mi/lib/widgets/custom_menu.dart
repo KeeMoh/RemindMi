@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/pages/calendar_page.dart';
+import 'package:remind_mi/pages/config_page.dart';
 import 'package:remind_mi/pages/home_page.dart';
-import 'package:remind_mi/pages/main_page.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/utils/charter.dart';
-import 'package:remind_mi/widgets/add_reminder_form.dart';
 
 class CustomMenu extends StatelessWidget {
   const CustomMenu({super.key});
@@ -15,40 +12,36 @@ class CustomMenu extends StatelessWidget {
   Widget build(BuildContext context) {
     return PopupMenuButton(
         // shape: ShapeBorder(OutlinedBorder(side: )),
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.all(
             Radius.circular(20.0),
           ),
         ),
         color: Charter.white,
-        offset: Offset(20, 50),
+        offset: const Offset(20, 50),
         itemBuilder: (context) => [
               PopupMenuItem(
                   child: GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              fullscreenDialog: false,
-                              builder: (context) => const HomePage())),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          fullscreenDialog: false,
+                          builder: (context) => const ToDoList())),
                       child: Row(
-                        children: [
+                        children: const [
                           Icon(Icons.star, color: Charter.red),
                           SizedBox(
                             width: 10,
                           ),
-                          Text("Accueil")
+                          Text("Évènements")
                         ],
                       ))),
               PopupMenuItem(
                   child: GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              fullscreenDialog: false,
-                              builder: (context) => const CalendarPage())),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          fullscreenDialog: false,
+                          builder: (context) => const CalendarPage())),
                       child: Row(
-                        children: [
-                          Icon(Icons.star, color: Charter.red),
+                        children: const [
+                          Icon(Icons.view_agenda, color: Charter.red),
                           SizedBox(
                             width: 10,
                           ),
@@ -57,18 +50,16 @@ class CustomMenu extends StatelessWidget {
                       ))),
               PopupMenuItem(
                   child: GestureDetector(
-                      onTap: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              fullscreenDialog: false,
-                              builder: (context) => const ToDoList())),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          fullscreenDialog: false,
+                          builder: (context) => const ConfigPage())),
                       child: Row(
-                        children: [
-                          Icon(Icons.star, color: Charter.red),
+                        children: const [
+                          Icon(Icons.settings, color: Charter.red),
                           SizedBox(
                             width: 10,
                           ),
-                          Text("Évènements")
+                          Text("Compte")
                         ],
                       ))),
             ]);

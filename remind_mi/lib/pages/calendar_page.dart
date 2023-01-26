@@ -1,13 +1,8 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminder_data_source.dart';
+import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/utils/charter.dart';
-import 'package:remind_mi/widgets/add_reminder_button.dart';
 import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
-import 'package:remind_mi/widgets/calendar/calendar_month.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -19,95 +14,111 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  final CalendarController _controller = CalendarController();
   late CalendarView calendarView;
   late ReminderDataSource reminders;
+  final Color _viewHeaderColor = Charter.secondarycolor,
+      _calendarColor = Charter.white;
 
   @override
   void initState() {
-    print("initState");
     calendarView = CalendarView.month;
-    reminders = ReminderDataSource(_getDataSource());
+    reminders = ReminderDataSource(Reminders.reminders);
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    // final get calendarView{}
-    var data = {"calendarView": calendarView, "reminders": reminders};
-
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Text("Agenda"),
-        actions: [CustomMenu()],
+        title: const Text("Agenda"),
+        actions: const [CustomMenu()],
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: [
-                ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        data["calendarView"] = CalendarView.week;
-                        print("setState");
-                        print(data);
-                      });
-                    },
-                    child: Text("Changer de format"))
-              ],
+          Expanded(
+            child: SfCalendar(
+              todayHighlightColor: Charter.red,
+              firstDayOfWeek: 1,
+              view: CalendarView.month,
+              // allowedViews: const [
+              //   // CalendarView.day,
+              //   CalendarView.week,
+              //   // CalendarView.workWeek,
+              //   CalendarView.month,
+              //   // CalendarView.timelineDay,
+              //   // CalendarView.timelineWeek,
+              //   // CalendarView.timelineWorkWeek
+              // ],
+              viewHeaderStyle:
+                  ViewHeaderStyle(backgroundColor: Charter.secondarycolor[300]),
+              backgroundColor: _calendarColor,
+              controller: _controller,
+              initialDisplayDate: DateTime.now(),
+              dataSource: ReminderDataSource(Reminders.reminders),
+              onTap: calendarTapped,
+              monthViewSettings: const MonthViewSettings(
+                  appointmentDisplayMode:
+                      MonthAppointmentDisplayMode.appointment),
             ),
           ),
-          Container(
-              decoration: BoxDecoration(color: Charter.secondarycolor),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CalendarMonth(data: data),
-              )),
         ],
       ),
       floatingActionButton: const AddReminderFloatingButton(),
+      bottomNavigationBar: BottomNavigationBar(
+        unselectedItemColor: Charter.secondarycolor[500],
+        backgroundColor: Charter.primarycolor,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_month),
+            label: 'Mois',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_week),
+            label: 'Semaine',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_day),
+            label: 'Jour',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Charter.secondarycolor,
+        onTap: _onItemTapped,
+      ),
     );
   }
 
-  void switchCalendarView(view) {
-    // calendarView = view;
-    setState(() {});
+  void calendarTapped(CalendarTapDetails calendarTapDetails) {
+    if (_controller.view == CalendarView.month ||
+        _controller.view == CalendarView.week) {
+      _controller.view = CalendarView.day;
+    }
+    // else if (_controller.view == CalendarView.day) {
+    //   Navigator.of(context).push(FormPage(reminder: calendarTapDetails.targetElement))
+    // }
   }
 
-  List<Reminder> _getDataSource() {
-    final List<Reminder> reminders = <Reminder>[];
-    final DateTime today = DateTime.now();
-    final DateTime startDate = DateTime(today.year, today.month, today.day, 9);
-    final DateTime endDate = startDate.add(const Duration(hours: 2));
-    reminders.add(Reminder(
-        userID: "", //FirebaseAuth.instance.currentUser!.uid
-        title: 'Conference',
-        startDate: startDate,
-        endDate: endDate));
-    return reminders;
+  void _onItemTapped(int index) {
+    switch (index) {
+      case 0:
+        _controller.view = CalendarView.month;
+        break;
+      case 1:
+        _controller.view = CalendarView.week;
+        break;
+      case 2:
+        _controller.view = CalendarView.day;
+        break;
+      default:
+    }
+    setState(() {
+      _selectedIndex = index;
+    });
   }
-}
-
-/// Custom business object class which contains properties to hold the detailed
-/// information about the event data which will be rendered in calendar.
-class Meeting {
-  /// Creates a meeting class with required details.
-  Meeting(this.eventName, this.from, this.to, this.background, this.isAllDay);
-
-  /// Event name which is equivalent to subject property of [Appointment].
-  String eventName;
-
-  /// From which is equivalent to start time property of [Appointment].
-  DateTime from;
-
-  /// To which is equivalent to end time property of [Appointment].
-  DateTime to;
-
-  /// Background which is equivalent to color property of [Appointment].
-  Color background;
-
-  /// IsAllDay which is equivalent to isAllDay property of [Appointment].
-  bool isAllDay;
 }
