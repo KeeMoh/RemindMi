@@ -25,6 +25,13 @@ class _ReminderWidgetState extends State<ReminderWidget> {
               color: HexColor(element.background),
               child: Row(
                 children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                        width: 50,
+                        child: Center(
+                            child: Text(getTimeBeforeReminder(element)))),
+                  ),
                   Expanded(
                       child: GestureDetector(
                     onTap: () => Navigator.push(
@@ -38,7 +45,8 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                         element.title.length > 80
                             ? element.title.substring(0, 80) + " (...)"
                             : element.title,
-                        style: TextStyle(fontSize: 20),
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                     ),
                   )),
@@ -76,5 +84,22 @@ class _ReminderWidgetState extends State<ReminderWidget> {
     return ListView(
       children: cardsWidget,
     );
+  }
+
+  String getTimeBeforeReminder(Reminder reminder) {
+    Duration test = reminder.startDate.difference(DateTime.now());
+    if (test.inDays > 1) {
+      return "${test.inDays}j";
+    }
+    if (test.inHours > 3) {
+      return "${test.inHours}h";
+    }
+    if (test.inHours >= 1) {
+      return "${test.inHours}h${test.inMinutes % 60}";
+    }
+    if (test.inMinutes > 0) {
+      return "${test.inMinutes}m";
+    }
+    return "En cours";
   }
 }
