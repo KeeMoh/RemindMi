@@ -42,6 +42,7 @@ class _CalendarPageState extends State<CalendarPage> {
         children: [
           Expanded(
             child: SfCalendar(
+              timeZone: 'Romance Standard Time',
               todayHighlightColor: _viewHeaderColor,
               firstDayOfWeek: 1,
               view: CalendarView.month,
