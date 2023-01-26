@@ -46,7 +46,7 @@ class Reminder {
             ? null
             : DateTime.parse(json['reminder'].toDate().toString()),
         recurrence: json['recurrence'],
-        background: json['background'],
+        background: json['background'] ?? "FF4CAF50",
         // background: json['background'],
         isAllDay: json['isAllDay'],
       );

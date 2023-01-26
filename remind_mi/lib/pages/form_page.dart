@@ -267,7 +267,7 @@ Future saveReminder(docId, formular, reminder) async {
           description: formular["description"],
           reminder: formular["reminder"],
           recurrence: formular["recurrence"],
-          background: formular["background"] ?? "FF4CAF50",
+          background: formular["background_color"] ?? "FF4CAF50",
           isAllDay: formular["all_day_long"]);
 
       final json = reminder.toJson();
@@ -288,7 +288,7 @@ Future saveReminder(docId, formular, reminder) async {
             description: formular["description"],
             reminder: formular["reminder"],
             recurrence: formular["recurrence"],
-            background: formular["background"] ?? "FF4CAF50",
+            background: formular["background_color"] ?? "FF4CAF50",
             isAllDay: formular["all_day_long"]);
 
         final json = reminder.toJson();

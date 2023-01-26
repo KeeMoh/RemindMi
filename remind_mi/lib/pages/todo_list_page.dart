@@ -33,6 +33,7 @@ class _ToDoListState extends State<ToDoList> {
       body: StreamBuilder<List<Reminder>>(
           stream: readReminders(),
           builder: (context, snapshot) {
+            print(snapshot.toString());
             if (snapshot.hasError) {
               return Text('Une erreur est survenue ! ${snapshot.error}');
             } else if (snapshot.hasData) {

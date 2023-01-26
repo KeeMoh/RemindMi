@@ -61,22 +61,6 @@ class CustomMenu extends StatelessWidget {
                           Text("Compte")
                         ],
                       ))),
-              PopupMenuItem(
-                  child: GestureDetector(
-                      onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const ConfigPage(),
-                            ),
-                          ),
-                      child: Row(
-                        children: const [
-                          Icon(Icons.star, color: Charter.red),
-                          SizedBox(
-                            width: 10,
-                          ),
-                          Text("Compte")
-                        ],
-                      ))),
             ]);
   }
 }

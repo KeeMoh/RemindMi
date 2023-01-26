@@ -20,8 +20,7 @@ class _CalendarPageState extends State<CalendarPage> {
   final CalendarController _controller = CalendarController();
   late CalendarView calendarView;
   late ReminderDataSource reminders;
-  final Color _viewHeaderColor = Charter.secondarycolor,
-      _calendarColor = Charter.white;
+  final Color _viewHeaderColor = Charter.red, _calendarColor = Charter.white;
 
   @override
   void initState() {
@@ -43,18 +42,9 @@ class _CalendarPageState extends State<CalendarPage> {
         children: [
           Expanded(
             child: SfCalendar(
-              todayHighlightColor: Charter.red,
+              todayHighlightColor: _viewHeaderColor,
               firstDayOfWeek: 1,
               view: CalendarView.month,
-              // allowedViews: const [
-              //   // CalendarView.day,
-              //   CalendarView.week,
-              //   // CalendarView.workWeek,
-              //   CalendarView.month,
-              //   // CalendarView.timelineDay,
-              //   // CalendarView.timelineWeek,
-              //   // CalendarView.timelineWorkWeek
-              // ],
               viewHeaderStyle:
                   ViewHeaderStyle(backgroundColor: Charter.secondarycolor[300]),
               backgroundColor: _calendarColor,
@@ -99,9 +89,9 @@ class _CalendarPageState extends State<CalendarPage> {
         _controller.view == CalendarView.week) {
       _controller.view = CalendarView.day;
     }
-    // else if (_controller.view == CalendarView.day) {
-    //   Navigator.of(context).push(FormPage(reminder: calendarTapDetails.targetElement))
-    // }
+    setState(() {
+      _selectedIndex = 2;
+    });
   }
 
   void _onItemTapped(int index) {
