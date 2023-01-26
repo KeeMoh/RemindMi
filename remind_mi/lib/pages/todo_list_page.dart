@@ -8,7 +8,6 @@ import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_button.dart';
 import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
-import 'package:remind_mi/widgets/add_reminder_form.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:remind_mi/widgets/task_widget.dart';
 

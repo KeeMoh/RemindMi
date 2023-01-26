@@ -3,7 +3,6 @@ import 'package:remind_mi/models/reminder_data_source.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
-import 'package:remind_mi/widgets/bottom_nav.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -15,6 +14,9 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  int _selectedIndex = 0;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   final CalendarController _controller = CalendarController();
   late CalendarView calendarView;
   late ReminderDataSource reminders;
@@ -41,16 +43,18 @@ class _CalendarPageState extends State<CalendarPage> {
         children: [
           Expanded(
             child: SfCalendar(
+              todayHighlightColor: Charter.red,
+              firstDayOfWeek: 1,
               view: CalendarView.month,
-              allowedViews: const [
-                // CalendarView.day,
-                CalendarView.week,
-                // CalendarView.workWeek,
-                CalendarView.month,
-                // CalendarView.timelineDay,
-                // CalendarView.timelineWeek,
-                // CalendarView.timelineWorkWeek
-              ],
+              // allowedViews: const [
+              //   // CalendarView.day,
+              //   CalendarView.week,
+              //   // CalendarView.workWeek,
+              //   CalendarView.month,
+              //   // CalendarView.timelineDay,
+              //   // CalendarView.timelineWeek,
+              //   // CalendarView.timelineWorkWeek
+              // ],
               viewHeaderStyle:
                   ViewHeaderStyle(backgroundColor: Charter.secondarycolor[300]),
               backgroundColor: _calendarColor,
@@ -63,43 +67,30 @@ class _CalendarPageState extends State<CalendarPage> {
                       MonthAppointmentDisplayMode.appointment),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Center(
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                        onPressed: () {
-                          _controller.view = CalendarView.month;
-                        },
-                        child: const Text("Mois")),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                        onPressed: () {
-                          _controller.view = CalendarView.week;
-                        },
-                        child: const Text("Semaine")),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ElevatedButton(
-                        onPressed: () {
-                          _controller.view = CalendarView.day;
-                        },
-                        child: const Text("Jour")),
-                  )
-                ],
-              ),
-            ),
-          ),
         ],
       ),
       floatingActionButton: const AddReminderFloatingButton(),
-      // bottomNavigationBar: const BottomNav(),
+      bottomNavigationBar: BottomNavigationBar(
+        unselectedItemColor: Charter.secondarycolor[500],
+        backgroundColor: Charter.primarycolor,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_month),
+            label: 'Mois',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_week),
+            label: 'Semaine',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.calendar_view_day),
+            label: 'Jour',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Charter.secondarycolor,
+        onTap: _onItemTapped,
+      ),
     );
   }
 
@@ -111,5 +102,23 @@ class _CalendarPageState extends State<CalendarPage> {
     // else if (_controller.view == CalendarView.day) {
     //   Navigator.of(context).push(FormPage(reminder: calendarTapDetails.targetElement))
     // }
+  }
+
+  void _onItemTapped(int index) {
+    switch (index) {
+      case 0:
+        _controller.view = CalendarView.month;
+        break;
+      case 1:
+        _controller.view = CalendarView.week;
+        break;
+      case 2:
+        _controller.view = CalendarView.day;
+        break;
+      default:
+    }
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 }

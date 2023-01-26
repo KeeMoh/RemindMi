@@ -1,11 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/pages/form_page.dart';
-import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/utils/charter.dart';
-import 'package:remind_mi/widgets/add_reminder_form.dart';
 
 class AddReminderButton extends StatefulWidget {
   final Map<String, dynamic>? data;
@@ -26,13 +21,6 @@ class _AddReminderButtonState extends State<AddReminderButton> {
     setState(() {});
   }
 
-  // void updateReminderList(text) {
-  //   print("mise à jour !");
-  //   Reminder.reminders.add(Reminder(text));
-  //   setState(() {});
-  //   // toDoListPage.updateReminderList(text);
-  // }
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -47,13 +35,10 @@ class _AddReminderButtonState extends State<AddReminderButton> {
             shape: RoundedRectangleBorder(
                 //to set border radius to button
                 borderRadius: BorderRadius.circular(30)),
-            padding: EdgeInsets.all(5)),
+            padding: const EdgeInsets.all(5)),
         onPressed: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  fullscreenDialog: false,
-                  builder: (context) => const FormPage()));
+          Navigator.of(context).push(MaterialPageRoute(
+              fullscreenDialog: false, builder: (context) => const FormPage()));
         },
         child: const Center(
             child: Text(
