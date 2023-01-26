@@ -19,64 +19,67 @@ class _ReminderWidgetState extends State<ReminderWidget> {
   List<Reminder> reminders = Reminders.reminders;
 
   get cardsWidget => reminders
-      .map((element) => Padding(
-            padding: EdgeInsets.only(bottom: 5),
-            child: Container(
-              color: HexColor(element.background),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                        width: 50,
-                        child: Center(
-                            child: Text(getTimeBeforeReminder(element)))),
-                  ),
-                  Expanded(
-                      child: GestureDetector(
-                    onTap: () => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            fullscreenDialog: false,
-                            builder: (context) => FormPage(reminder: element))),
-                    child: Padding(
+      .map((element) => element.endDate.isBefore(DateTime.now())
+          ? const SizedBox()
+          : Padding(
+              padding: EdgeInsets.only(bottom: 5),
+              child: Container(
+                color: HexColor(element.background),
+                child: Row(
+                  children: [
+                    Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        element.title.length > 80
-                            ? element.title.substring(0, 80) + " (...)"
-                            : element.title,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
+                      child: SizedBox(
+                          width: 50,
+                          child: Center(
+                              child: Text(getTimeBeforeReminder(element)))),
                     ),
-                  )),
-                  FloatingActionButton(
-                      backgroundColor: Charter.secondarycolor,
-                      mini: true,
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                fullscreenDialog: false,
-                                builder: (context) =>
-                                    FormPage(reminder: element)));
-                      },
-                      child: const Icon(Icons.edit, size: 20)),
-                  FloatingActionButton(
-                      backgroundColor: Color.fromARGB(170, 255, 55, 0),
-                      mini: true,
-                      onPressed: () {
-                        //supress actual reminder
-                        //reminders.add(Reminder(_controller.text));
-                        setState(() {
-                          reminders.remove(element);
-                        });
-                      },
-                      child: const Icon(Icons.delete, size: 20)),
-                ],
+                    Expanded(
+                        child: GestureDetector(
+                      onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              fullscreenDialog: false,
+                              builder: (context) =>
+                                  FormPage(reminder: element))),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          element.title.length > 80
+                              ? element.title.substring(0, 80) + " (...)"
+                              : element.title,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    )),
+                    FloatingActionButton(
+                        backgroundColor: Charter.secondarycolor,
+                        mini: true,
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  fullscreenDialog: false,
+                                  builder: (context) =>
+                                      FormPage(reminder: element)));
+                        },
+                        child: const Icon(Icons.edit, size: 20)),
+                    FloatingActionButton(
+                        backgroundColor: Color.fromARGB(170, 255, 55, 0),
+                        mini: true,
+                        onPressed: () {
+                          //supress actual reminder
+                          //reminders.add(Reminder(_controller.text));
+                          setState(() {
+                            reminders.remove(element);
+                          });
+                        },
+                        child: const Icon(Icons.delete, size: 20)),
+                  ],
+                ),
               ),
-            ),
-          ))
+            ))
       .toList();
 
   @override

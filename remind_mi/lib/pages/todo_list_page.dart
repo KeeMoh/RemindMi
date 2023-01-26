@@ -33,7 +33,6 @@ class _ToDoListState extends State<ToDoList> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     // _controller = TextEditingController();
     // fillReminders();
@@ -45,12 +44,12 @@ class _ToDoListState extends State<ToDoList> {
       appBar: AppBar(
           backgroundColor: Charter.secondarycolor,
           automaticallyImplyLeading: false,
-          title: Text('Liste des tâches'),
+          title: const Text('Tâches à venir'),
           centerTitle: true,
-          actions: [CustomMenu()]),
+          actions: const [CustomMenu()]),
       body: Column(
         children: [
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Expanded(
             child: Container(color: Charter.primarycolor, child: cardsWidget),
           )
