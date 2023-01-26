@@ -6,6 +6,7 @@ import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/form_page.dart';
 import 'package:remind_mi/utils/charter.dart';
+import 'package:remind_mi/utils/hex_color.dart';
 
 class ReminderWidget extends StatefulWidget {
   const ReminderWidget({super.key});
@@ -21,7 +22,7 @@ class _ReminderWidgetState extends State<ReminderWidget> {
       .map((element) => Padding(
             padding: EdgeInsets.only(bottom: 5),
             child: Container(
-              color: element.background,
+              color: HexColor(element.background),
               child: Row(
                 children: [
                   Expanded(

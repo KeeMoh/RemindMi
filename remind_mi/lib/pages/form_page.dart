@@ -9,6 +9,7 @@ import 'package:remind_mi/models/reminder.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
+import 'package:remind_mi/utils/hex_color.dart';
 
 class FormPage extends StatefulWidget {
   final Reminder? reminder;
@@ -24,15 +25,15 @@ class _FormPageState extends State<FormPage> {
   // bool reminding = false;
   // final isAllDay = ValueNotifier<bool>(false);
   // final user = FirebaseAuth.instance.currentUser!;
-  List<MaterialColor> availableColors = [
-    Colors.green,
-    Colors.red,
-    Colors.blue,
-    Colors.pink,
-    Colors.orange,
-    Colors.purple,
-    Colors.grey,
-    Colors.yellow
+  List<String> availableColors = [
+    "FF4CAF50",
+    "FFF44336",
+    "FF2196F3",
+    "FFE91E63",
+    "FFFF9800",
+    "FF9C27B0",
+    "FF9E9E9E",
+    "FFFFEB3B"
   ];
 
   @override
@@ -170,7 +171,7 @@ class _FormPageState extends State<FormPage> {
                                   height: 20,
                                   width: 20,
                                   decoration: BoxDecoration(
-                                      color: e,
+                                      color: HexColor(e),
                                       borderRadius: BorderRadius.circular(10)),
                                 )))
                             .toList(),

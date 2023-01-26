@@ -1,5 +1,6 @@
 import 'package:flutter/animation.dart';
 import 'package:remind_mi/models/reminder.dart';
+import 'package:remind_mi/utils/hex_color.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
 /// An object to set the appointment collection data source to calendar, which
@@ -29,7 +30,7 @@ class ReminderDataSource extends CalendarDataSource {
 
   @override
   Color getColor(int index) {
-    return _getReminderData(index).background;
+    return HexColor(_getReminderData(index).background);
   }
 
   @override
