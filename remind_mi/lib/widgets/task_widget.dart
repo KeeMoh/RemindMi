@@ -21,10 +21,26 @@ class _ReminderWidgetState extends State<ReminderWidget> {
       .map((element) => Padding(
             padding: EdgeInsets.only(bottom: 5),
             child: Container(
-              color: Charter.secondarycolor[600],
+              color: element.background,
               child: Row(
                 children: [
-                  Expanded(child: Text(element.title)),
+                  Expanded(
+                      child: GestureDetector(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            fullscreenDialog: false,
+                            builder: (context) => FormPage(reminder: element))),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        element.title.length > 80
+                            ? element.title.substring(0, 80) + " (...)"
+                            : element.title,
+                        style: TextStyle(fontSize: 20),
+                      ),
+                    ),
+                  )),
                   FloatingActionButton(
                       backgroundColor: Charter.secondarycolor,
                       mini: true,
@@ -35,8 +51,6 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                                 fullscreenDialog: false,
                                 builder: (context) =>
                                     FormPage(reminder: element)));
-                        print(
-                            "Le bouton fait rien quoi ?" + element.toString());
                       },
                       child: const Icon(Icons.edit, size: 20)),
                   FloatingActionButton(

@@ -37,6 +37,11 @@ class ReminderDataSource extends CalendarDataSource {
     return _getReminderData(index).isAllDay;
   }
 
+  @override
+  String? getRecurrenceRule(int index) {
+    return _getReminderData(index).recurrence;
+  }
+
   Reminder _getReminderData(int index) {
     final dynamic reminder = appointments![index];
     late final Reminder reminderData;

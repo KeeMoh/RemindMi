@@ -15,6 +15,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('Nous sommes content de te revoir !'),
           actions: const [CustomMenu()],
         ),

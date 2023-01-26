@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:remind_mi/pages/form_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -25,14 +26,14 @@ class _CalendarMonthState extends State<CalendarMonth> {
       // height: screenWidth,
       // width: screenWidth,
       child: SfCalendar(
-        view: CalendarView.week,
+        view: CalendarView.month,
         allowedViews: [
-          CalendarView.day,
+          // CalendarView.day,
           CalendarView.week,
           // CalendarView.workWeek,
           CalendarView.month,
-          CalendarView.timelineDay,
-          CalendarView.timelineWeek,
+          // CalendarView.timelineDay,
+          // CalendarView.timelineWeek,
           // CalendarView.timelineWorkWeek
         ],
         viewHeaderStyle: ViewHeaderStyle(backgroundColor: _viewHeaderColor),
@@ -57,19 +58,16 @@ class _CalendarMonthState extends State<CalendarMonth> {
   }
 
   void calendarTapped(CalendarTapDetails calendarTapDetails) {
-    print("Lololo");
-    if (_controller.view == CalendarView.month &&
-        calendarTapDetails.targetElement == CalendarElement.calendarCell) {
-      _controller.view = CalendarView.day;
-    } else if ((_controller.view == CalendarView.week ||
-            _controller.view == CalendarView.workWeek) &&
-        calendarTapDetails.targetElement == CalendarElement.viewHeader) {
+    if (_controller.view == CalendarView.month ||
+        _controller.view == CalendarView.week) {
       _controller.view = CalendarView.day;
     }
+    // else if (_controller.view == CalendarView.day) {
+    //   Navigator.of(context).push(FormPage(reminder: calendarTapDetails.targetElement))
+    // }
   }
 
   void viewChange() {
-    print("TRololo");
     if (_controller.view == CalendarView.week) {
       _controller.view = CalendarView.month;
     } else if (_controller.view == CalendarView.month) {

@@ -6,6 +6,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
 import 'package:remind_mi/models/reminder.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
 
@@ -23,6 +24,16 @@ class _FormPageState extends State<FormPage> {
   // bool reminding = false;
   // final isAllDay = ValueNotifier<bool>(false);
   // final user = FirebaseAuth.instance.currentUser!;
+  List<MaterialColor> availableColors = [
+    Colors.green,
+    Colors.red,
+    Colors.blue,
+    Colors.pink,
+    Colors.orange,
+    Colors.purple,
+    Colors.grey,
+    Colors.yellow
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -144,6 +155,29 @@ class _FormPageState extends State<FormPage> {
                           FormBuilderValidators.required(),
                         ]),
                       ),
+                      FormBuilderDropdown(
+                        iconSize: 40,
+                        decoration: const InputDecoration(
+                            labelText: 'Couleur de fond',
+                            labelStyle:
+                                TextStyle(color: Colors.white, fontSize: 16)),
+                        alignment: AlignmentDirectional.bottomEnd,
+                        name: "background_color",
+                        items: availableColors
+                            .map((e) => DropdownMenuItem(
+                                value: e,
+                                child: Container(
+                                  height: 20,
+                                  width: 20,
+                                  decoration: BoxDecoration(
+                                      color: e,
+                                      borderRadius: BorderRadius.circular(10)),
+                                )))
+                            .toList(),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(),
+                        ]),
+                      ),
                       const SizedBox(height: 20),
                       ElevatedButton(
                         onPressed: () {
@@ -221,6 +255,7 @@ void addReminder(formData) {
       startDate: formData["begin_date"],
       endDate: formData["end_date"],
       description: formData["description"],
+      background: formData["background_color"] ?? Colors.amber,
       isAllDay: formData["all_day_long"]));
   // setState(() {});
 }
@@ -239,7 +274,7 @@ bool isSavePossible(formular, reminder) {
 }
 
 void delete(reminder) {
-  // Reminders.reminders.remove(reminder);
+  Reminders.reminders.remove(reminder);
   print("delete");
 }
 // enum recurrence {
