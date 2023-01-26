@@ -32,6 +32,7 @@ class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Charter.secondarycolor,
         foregroundColor: Charter.primarycolor,
         elevation: 0,

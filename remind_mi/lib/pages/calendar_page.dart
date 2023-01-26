@@ -3,6 +3,7 @@ import 'package:remind_mi/models/reminder_data_source.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
+import 'package:remind_mi/widgets/bottom_nav.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 
@@ -31,6 +32,7 @@ class _CalendarPageState extends State<CalendarPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         centerTitle: true,
         title: const Text("Agenda"),
         actions: const [CustomMenu()],
@@ -50,7 +52,7 @@ class _CalendarPageState extends State<CalendarPage> {
                 // CalendarView.timelineWorkWeek
               ],
               viewHeaderStyle:
-                  ViewHeaderStyle(backgroundColor: _viewHeaderColor),
+                  ViewHeaderStyle(backgroundColor: Charter.secondarycolor[300]),
               backgroundColor: _calendarColor,
               controller: _controller,
               initialDisplayDate: DateTime.now(),
@@ -97,6 +99,7 @@ class _CalendarPageState extends State<CalendarPage> {
         ],
       ),
       floatingActionButton: const AddReminderFloatingButton(),
+      // bottomNavigationBar: const BottomNav(),
     );
   }
 
