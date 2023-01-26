@@ -18,7 +18,6 @@ class _AddReminderButtonState extends State<AddReminderButton> {
   void dispose() {
     _controller.dispose();
     super.dispose();
-    setState(() {});
   }
 
   @override

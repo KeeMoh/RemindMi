@@ -82,14 +82,13 @@ class _SignInWidgetState extends State<SignInWidget> {
             ),
             const SizedBox(height: 24),
             GestureDetector(
-              child: Text(
-                "mot de passe oublié?",
-                style: TextStyle(
-                decoration: TextDecoration.underline,
-                fontSize: 16,
-                color: Theme.of(context).colorScheme.secondary)
-              ),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ForgotPasswordPage())),
+              child: Text("mot de passe oublié?",
+                  style: TextStyle(
+                      decoration: TextDecoration.underline,
+                      fontSize: 16,
+                      color: Theme.of(context).colorScheme.secondary)),
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const ForgotPasswordPage())),
             ),
             const SizedBox(height: 20),
             Text(errMsg!,
@@ -154,13 +153,13 @@ class _SignInWidgetState extends State<SignInWidget> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
-        navigatorKey.currentState!.popUntil((route) => route.isFirst);
       } on FirebaseAuthException catch (e) {
         setState(() {
           passwordController.text = '';
           errMsg = e.message;
         });
       }
+      navigatorKey.currentState!.popUntil((route) => route.isFirst);
     }
   }
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:remind_mi/pages/calendar_page.dart';
 import 'package:remind_mi/pages/config_page.dart';
-import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 

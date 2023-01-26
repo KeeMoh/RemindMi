@@ -1,13 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminders.dart';
-import 'package:remind_mi/pages/home_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/add_reminder_button.dart';
-import 'package:remind_mi/widgets/add_reminder_floatingButton.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 import 'package:remind_mi/widgets/task_widget.dart';
 
@@ -19,24 +16,9 @@ class ToDoList extends StatefulWidget {
 }
 
 class _ToDoListState extends State<ToDoList> {
-  int cards = 2;
-  List<Reminder> reminders = Reminders.reminders;
-
-  get cardsWidget => reminders.isEmpty
-      ? const Center(
-          child: Text(
-            "Vous n'avez pas de tâches à venir ...",
-            style: TextStyle(color: Charter.white),
-          ),
-        )
-      : const ReminderWidget();
-
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    // _controller = TextEditingController();
-    // fillReminders();
   }
 
   @override
@@ -45,18 +27,40 @@ class _ToDoListState extends State<ToDoList> {
       appBar: AppBar(
           backgroundColor: Charter.secondarycolor,
           automaticallyImplyLeading: false,
-          title: Text('Liste des tâches'),
+          title: const Text('Tâches à venir'),
           centerTitle: true,
-          actions: [CustomMenu()]),
-      body: Column(
-        children: [
-          SizedBox(height: 10),
-          Expanded(
-            child: Container(color: Charter.primarycolor, child: cardsWidget),
-          )
-        ],
-      ),
+          actions: const [CustomMenu()]),
+      body: StreamBuilder<List<Reminder>>(
+          stream: readReminders(),
+          builder: (context, snapshot) {
+            print(snapshot.toString());
+            if (snapshot.hasError) {
+              return Text('Une erreur est survenue ! ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              final reminders = snapshot.data!;
+              Reminders.reminders = reminders;
+              return (Reminders.reminders.isEmpty)
+                  ? const Center(
+                      child: Text(
+                        "Vous n'avez pas de tâches à venir ...",
+                        style: TextStyle(color: Charter.white),
+                      ),
+                    )
+                  : (const ReminderWidget());
+            } else {
+              return const Center(child: CircularProgressIndicator());
+            }
+          }),
       floatingActionButton: const AddReminderButton(),
     );
   }
 }
+
+Stream<List<Reminder>> readReminders() => FirebaseFirestore.instance
+    .collection('reminder_collection')
+    .doc(FirebaseAuth.instance.currentUser!.uid)
+    .collection('reminders')
+    .snapshots()
+    .map((snapshot) => snapshot.docs
+        .map((doc) => Reminder.fromJson(doc.data(), ref: doc.reference))
+        .toList());

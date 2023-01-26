@@ -1,25 +1,18 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Reminder {
-  String userID;
-
-  //!TODO Changer l'id !
-  final int id = 1;
-
+  DocumentReference? ref;
+  String title;
+  DateTime startDate;
+  DateTime endDate;
   String? description;
   String? recurrence;
   DateTime? reminder;
-  String title;
-  //which is equivalent to subject property of [Appointment].
-  DateTime startDate;
-  // which is equivalent to start time property of [Appointment].
-  DateTime endDate;
-  //which is equivalent to end time property of [Appointment].
   String background;
-  //which is equivalent to color property of [Appointment].
   bool isAllDay;
-  //which is equivalent to isAllDay property of [Appointment].
 
   Reminder(
-      {required this.userID,
+      {this.ref,
       required this.title,
       required this.startDate,
       required this.endDate,
@@ -28,4 +21,37 @@ class Reminder {
       this.reminder,
       required this.background,
       this.isAllDay = false});
+
+  Map<String, dynamic> toJson() => {
+        'title': title,
+        'description': description,
+        'startDate': startDate,
+        'endDate': endDate,
+        'reminder': reminder,
+        'recurrence': recurrence,
+        'background': background,
+        // 'background': background,
+        'isAllDay': isAllDay,
+      };
+
+  static Reminder fromJson(Map<String, dynamic> json,
+          {required DocumentReference ref}) =>
+      Reminder(
+        ref: ref,
+        title: json['title'],
+        description: json['description'],
+        startDate: DateTime.parse(json['startDate'].toDate().toString()),
+        endDate: DateTime.parse(json['endDate'].toDate().toString()),
+        reminder: json['reminder'] == null
+            ? null
+            : DateTime.parse(json['reminder'].toDate().toString()),
+        recurrence: json['recurrence'],
+        background: json['background'] ?? "FF4CAF50",
+        // background: json['background'],
+        isAllDay: json['isAllDay'],
+      );
+
+  void delete() {
+    ref?.delete();
+  }
 }
