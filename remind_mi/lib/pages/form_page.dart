@@ -8,7 +8,9 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
+import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/utils/hex_color.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class FormPage extends StatefulWidget {
   final Reminder? reminder;
@@ -33,6 +35,7 @@ class _FormPageState extends State<FormPage> {
     "FF9E9E9E",
     "FFFFEB3B"
   ];
+  // final String _backgroundColor = "FFFFEB3B";
 
   // void init() async {
   //   print("init form 1 : " + widget.reminder.toString());
@@ -53,6 +56,7 @@ class _FormPageState extends State<FormPage> {
 
   @override
   Widget build(BuildContext context) {
+    Color _backgroundColor = Colors.red;
     return Scaffold(
         appBar: AppBar(
           title: const Text('Nouvel évènement'),
@@ -166,30 +170,131 @@ class _FormPageState extends State<FormPage> {
                       FormBuilderValidators.required(),
                     ]),
                   ),
-                  FormBuilderDropdown(
-                    iconSize: 40,
-                    decoration: const InputDecoration(
-                        labelText: 'Couleur de fond',
-                        labelStyle:
-                            TextStyle(color: Colors.white, fontSize: 16)),
-                    alignment: AlignmentDirectional.bottomEnd,
-                    name: "background_color",
-                    items: availableColors
-                        .map((e) => DropdownMenuItem(
-                            value: e,
-                            child: Container(
-                              height: 20,
-                              width: 20,
-                              decoration: BoxDecoration(
-                                  color: HexColor(e),
-                                  borderRadius: BorderRadius.circular(10)),
-                            )))
-                        .toList(),
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(),
-                    ]),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Couleur de fond :",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color.fromRGBO(248, 228, 148, 1)),
+                        ),
+                        SizedBox(width: 20),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FormBuilderField<String?>(
+                            name: 'background_color',
+                            builder: (FormFieldState field) {
+                              return Container(
+                                height: 35,
+                                width: 65,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0)),
+                                      backgroundColor: _backgroundColor),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                "Choisissez une couleur"),
+                                            content: BlockPicker(
+                                                pickerColor:
+                                                    _backgroundColor, //default color
+                                                onColorChanged: (Color color) {
+                                                  _backgroundColor = color;
+                                                  field.didChange(
+                                                      getStringFromColor(
+                                                          color));
+                                                  Navigator.pop(context);
+                                                }),
+                                          );
+                                        });
+                                  },
+                                  child: const SizedBox(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      const Text(
+                        "Récurrence :",
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                      ),
+                      SizedBox(width: 20),
+                      Expanded(
+                        child: FormBuilderDropdown(
+                          menuMaxHeight: 300,
+                          initialValue: "aucun",
+                          iconSize: 40,
+                          dropdownColor: Charter.primarycolor,
+                          // decoration: const InputDecoration(
+                          //     labelText: 'Couleur de fond',
+                          //     labelStyle:
+                          //         TextStyle(color: Colors.white, fontSize: 16)),
+                          // alignment: AlignmentDirectional.bottomEnd,
+                          name: "recurrence",
+                          items: [
+                            DropdownMenuItem(
+                              value: "aucun",
+                              child: Text(
+                                "aucun",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=DAILY;INTERVAL=1",
+                              child: Text(
+                                "quotidien",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=WEEKLY;INTERVAL=1",
+                              child: Text(
+                                "hebdomadaire",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=MONTHLY;INTERVAL=1",
+                              child: Text(
+                                "mensuel",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=YEARLY;INTERVAL=1",
+                              child: Text(
+                                "annuel",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                          ],
+                          // validator: FormBuilderValidators.compose([
+                          //   FormBuilderValidators.required(),
+                          // ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: () async {
                       await saveReminder(
@@ -249,6 +354,23 @@ class _FormPageState extends State<FormPage> {
   DateTime endDate() {
     return DateTime.now().add(const Duration(hours: 2));
   }
+}
+
+String getStringFromColor(dynamic color) {
+  print(color);
+  if (color.runtimeType == MaterialColor) {
+    return color
+        .toString()
+        .substring(color.toString().length - 10, color.toString().length - 2)
+        .toUpperCase();
+  }
+  if (color.runtimeType == Color) {
+    return color
+        .toString()
+        .substring(color.toString().length - 9, color.toString().length - 1)
+        .toUpperCase();
+  }
+  return "FFFCFCFC";
 }
 
 Future saveReminder(formular, reminder) async {
