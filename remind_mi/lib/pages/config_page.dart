@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:remind_mi/pages/main_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/widgets/custom_menu.dart';
 
@@ -17,9 +17,6 @@ class _ConfigPageState extends State<ConfigPage> {
   final passwordController = TextEditingController();
   final confirmePasswordController = TextEditingController();
   final user = FirebaseAuth.instance.currentUser!;
-
-  String? errMsg = '';
-  String? successMsg = '';
 
   @override
   void dispose() {
@@ -120,20 +117,7 @@ class _ConfigPageState extends State<ConfigPage> {
                             ? 'Vos mots de passes doivent être identiques'
                             : null),
                       ),
-                      const SizedBox(height: 20),
-                      Text(errMsg!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red)),
-                      Text(successMsg!,
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.green)),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 30),
                     ]),
                   ),
                   const SizedBox(height: 20),
@@ -181,37 +165,47 @@ class _ConfigPageState extends State<ConfigPage> {
           builder: (context) =>
               const Center(child: CircularProgressIndicator()));
 
+      print("here");
       User? currentUser = firebaseAuth.currentUser;
       currentUser?.updatePassword(passwordController.text).then((res) {
         passwordController.text = "";
         confirmePasswordController.text = "";
-        setState(() {
-          errMsg = "";
-          successMsg = "mot de passe modifié avec succès !";
-        });
+
+        const successSnackBar = SnackBar(
+          content: Text('Mot de passe modifié avec succès !'),
+          backgroundColor: Color.fromARGB(255, 83, 201, 87),
+          duration: Duration(seconds: 6),
+        );
+
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
       }).catchError((err) {
         passwordController.text = "";
         confirmePasswordController.text = "";
-        setState(() {
-          errMsg = err.message;
-          successMsg = "";
-        });
+        final errSnackBar = SnackBar(
+          content: Text('Erreur : ${err.message}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 6),
+        );
+
+        // Utils.showSnackBar(e.message);
+        Navigator.of(context).pop();
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(errSnackBar);
       });
-      // Utils.showSnackBar(e.message);
-      Navigator.of(context).pop();
     }
   }
 
   Future signOut() async {
     try {
       FirebaseAuth.instance.signOut();
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => const MainPage(),
-        ),
-      );
     } on FirebaseAuthException catch (e) {
       print(e);
     }
+    context.go('/');
   }
 }

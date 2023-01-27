@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:remind_mi/pages/calendar_page.dart';
-import 'package:remind_mi/pages/config_page.dart';
-import 'package:remind_mi/pages/todo_list_page.dart';
+import 'package:go_router/go_router.dart';
 import 'package:remind_mi/utils/charter.dart';
 
 class CustomMenu extends StatelessWidget {
@@ -21,9 +19,7 @@ class CustomMenu extends StatelessWidget {
         itemBuilder: (context) => [
               PopupMenuItem(
                   child: GestureDetector(
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          fullscreenDialog: false,
-                          builder: (context) => const ToDoList())),
+                      onTap: () => context.go('/'),
                       child: Row(
                         children: const [
                           Icon(Icons.star, color: Charter.red),
@@ -35,9 +31,7 @@ class CustomMenu extends StatelessWidget {
                       ))),
               PopupMenuItem(
                   child: GestureDetector(
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          fullscreenDialog: false,
-                          builder: (context) => const CalendarPage())),
+                      onTap: () => context.go('/calendar'),
                       child: Row(
                         children: const [
                           Icon(Icons.view_agenda, color: Charter.red),
@@ -49,9 +43,7 @@ class CustomMenu extends StatelessWidget {
                       ))),
               PopupMenuItem(
                   child: GestureDetector(
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                          fullscreenDialog: false,
-                          builder: (context) => const ConfigPage())),
+                      onTap: () => context.go('/parameters'),
                       child: Row(
                         children: const [
                           Icon(Icons.settings, color: Charter.red),

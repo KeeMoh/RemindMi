@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:remind_mi/pages/main_page.dart';
+import 'package:remind_mi/config/routing.dart';
 import 'package:remind_mi/utils/charter.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -12,7 +12,7 @@ class RemindMiApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       //scaffoldMessengerKey: Utils.messengerKey, //a mettre en place quand utils sera corrigé
       title: 'RemindMi',
       theme: ThemeData(
@@ -28,11 +28,11 @@ class RemindMiApp extends StatelessWidget {
         primarySwatch: Charter.secondarycolor,
         scaffoldBackgroundColor: Charter.primarycolor,
       ),
-      home: const MainPage(),
       debugShowCheckedModeBanner: false,
-      navigatorKey: navigatorKey,
+      // navigatorKey: navigatorKey,
       localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
       supportedLocales: const [Locale('en'), Locale('fr')],
+      routerConfig: router,
     );
   }
 }

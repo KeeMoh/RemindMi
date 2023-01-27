@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/models/reminders.dart';
 import 'package:remind_mi/pages/form_page.dart';
@@ -20,7 +21,7 @@ class _ReminderWidgetState extends State<ReminderWidget> {
           ? const SizedBox()
           : Padding(
               key: ValueKey(element.ref?.id),
-              padding: EdgeInsets.only(bottom: 5),
+              padding: const EdgeInsets.only(bottom: 5),
               child: Container(
                 color: HexColor(element.background),
                 child: Row(
@@ -42,12 +43,14 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                               fullscreenDialog: false,
                               builder: (context) => FormPage(
                                     reminder: element,
+                                    beginDate: element.startDate,
+                                    endDate: element.endDate,
                                   ))),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
                           element.title.length > 80
-                              ? element.title.substring(0, 80) + " (...)"
+                              ? "${element.title.substring(0, 80)} (...)"
                               : element.title,
                           style: const TextStyle(
                               fontSize: 20, fontWeight: FontWeight.bold),
@@ -65,6 +68,8 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                                   fullscreenDialog: false,
                                   builder: (context) => FormPage(
                                         reminder: element,
+                                        beginDate: element.startDate,
+                                        endDate: element.endDate,
                                       )));
                         },
                         icon: const Icon(Icons.edit, size: 20)),

@@ -2,7 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:remind_mi/app.dart';
+import 'package:go_router/go_router.dart';
 import 'package:remind_mi/pages/forgot_pwd_page.dart';
 
 class SignInWidget extends StatefulWidget {
@@ -20,7 +20,6 @@ class _SignInWidgetState extends State<SignInWidget> {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
-  String? errMsg = '';
 
   @override
   void dispose() {
@@ -87,17 +86,9 @@ class _SignInWidgetState extends State<SignInWidget> {
                       decoration: TextDecoration.underline,
                       fontSize: 16,
                       color: Theme.of(context).colorScheme.secondary)),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => const ForgotPasswordPage())),
+              onTap: () => context.go('/reset'),
             ),
-            const SizedBox(height: 20),
-            Text(errMsg!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 30),
             ElevatedButton(
               onPressed: signIn,
               style: ElevatedButton.styleFrom(
@@ -153,13 +144,38 @@ class _SignInWidgetState extends State<SignInWidget> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
+
+        const successSnackBar = SnackBar(
+          content: Text('Connexion réussite'),
+          backgroundColor: Color.fromARGB(255, 83, 201, 87),
+          duration: Duration(seconds: 6),
+        );
+
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+
+        // ignore: use_build_context_synchronously
+        context.go("/");
       } on FirebaseAuthException catch (e) {
+        final errSnackBar = SnackBar(
+          content: Text('Erreur : ${e.message}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 6),
+        );
+
         setState(() {
           passwordController.text = '';
-          errMsg = e.message;
         });
+
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(errSnackBar);
       }
-      navigatorKey.currentState!.popUntil((route) => route.isFirst);
     }
   }
 }

@@ -6,11 +6,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
 import 'package:remind_mi/models/reminder.dart';
-import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/utils/charter.dart';
-import 'package:remind_mi/utils/hex_color.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:remind_mi/utils/hex_color.dart';
 
 class FormPage extends StatefulWidget {
   final Reminder? reminder;
@@ -25,20 +25,8 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final formKey = GlobalKey<FormBuilderState>();
   final user = FirebaseAuth.instance.currentUser!;
-  String errMsg = '';
-  // Reminder? reminder;
+  bool isEdit = false;
   bool isAllDay = false;
-  List<String> availableColors = [
-    "FF4CAF50",
-    "FFF44336",
-    "FF2196F3",
-    "FFE91E63",
-    "FFFF9800",
-    "FF9C27B0",
-    "FF9E9E9E",
-    "FFFFEB3B"
-  ];
-  // final String _backgroundColor = "FFFFEB3B";
 
   late DateTime valueBeginDate;
   late DateTime valueEndDate;
@@ -53,7 +41,9 @@ class _FormPageState extends State<FormPage> {
 
   @override
   Widget build(BuildContext context) {
-    Color _backgroundColor = Colors.red;
+    Color backgroundColor = (widget.reminder?.background != null)
+        ? HexColor(widget.reminder!.background)
+        : const Color(0xFFF44336);
     return Scaffold(
         appBar: AppBar(
           title: const Text('Nouvel évènement'),
@@ -64,7 +54,11 @@ class _FormPageState extends State<FormPage> {
                 key: formKey,
                 onChanged: () {
                   formKey.currentState!.save();
-                  debugPrint(formKey.currentState!.value.toString());
+                  if (!isEdit) {
+                    setState(() {
+                      isEdit = true;
+                    });
+                  }
                 },
                 autovalidateMode: AutovalidateMode.disabled,
                 child: ListView(children: [
@@ -190,13 +184,13 @@ class _FormPageState extends State<FormPage> {
                               fontSize: 16,
                               color: Color.fromRGBO(248, 228, 148, 1)),
                         ),
-                        SizedBox(width: 20),
+                        const SizedBox(width: 20),
                         Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: FormBuilderField<String?>(
                             name: 'background_color',
                             builder: (FormFieldState field) {
-                              return Container(
+                              return SizedBox(
                                 height: 35,
                                 width: 65,
                                 child: ElevatedButton(
@@ -204,7 +198,7 @@ class _FormPageState extends State<FormPage> {
                                       shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20.0)),
-                                      backgroundColor: _backgroundColor),
+                                      backgroundColor: backgroundColor),
                                   onPressed: () {
                                     showDialog(
                                         context: context,
@@ -214,9 +208,9 @@ class _FormPageState extends State<FormPage> {
                                                 "Choisissez une couleur"),
                                             content: BlockPicker(
                                                 pickerColor:
-                                                    _backgroundColor, //default color
+                                                    backgroundColor, //default color
                                                 onColorChanged: (Color color) {
-                                                  _backgroundColor = color;
+                                                  backgroundColor = color;
                                                   field.didChange(
                                                       getStringFromColor(
                                                           color));
@@ -242,7 +236,7 @@ class _FormPageState extends State<FormPage> {
                             fontSize: 16,
                             color: Color.fromRGBO(248, 228, 148, 1)),
                       ),
-                      SizedBox(width: 20),
+                      const SizedBox(width: 20),
                       Expanded(
                         child: FormBuilderDropdown(
                           menuMaxHeight: 300,
@@ -304,36 +298,31 @@ class _FormPageState extends State<FormPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 20),
-                  Text(errMsg,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red)),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      await saveReminder(
-                          formKey.currentState?.value, widget.reminder);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size.fromHeight(50),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Padding(
-                          padding: EdgeInsets.all(8.0),
-                          child: Text(
-                            'Enregistrer',
-                            style: TextStyle(fontSize: 24),
+                  const SizedBox(height: 30),
+                  isEdit
+                      ? ElevatedButton(
+                          onPressed: () async {
+                            await saveReminder(
+                                formKey.currentState?.value, widget.reminder);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            minimumSize: const Size.fromHeight(50),
                           ),
-                        ),
-                        Icon(Icons.save, size: 24),
-                      ],
-                    ),
-                  ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Text(
+                                  'Enregistrer',
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                              ),
+                              Icon(Icons.save, size: 24),
+                            ],
+                          ),
+                        )
+                      : const SizedBox(height: 10),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
@@ -346,15 +335,17 @@ class _FormPageState extends State<FormPage> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Padding(
-                          padding: EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(8.0),
                           child: Text(
-                            'Supprimer',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
+                            isEdit ? 'Supprimer' : 'Annuler',
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white),
                           ),
                         ),
-                        Icon(Icons.delete, size: 24, color: Colors.white),
+                        Icon(isEdit ? Icons.delete : Icons.arrow_back,
+                            size: 24, color: Colors.white),
                       ],
                     ),
                   ),
@@ -362,41 +353,22 @@ class _FormPageState extends State<FormPage> {
   }
 
   Future saveReminder(formular, reminder) async {
-    if (formular["title"] != null && formular["title"] != "") {
-      if (formular["end_date"]!.isAfter(formular["begin_date"])) {
-        String? id = reminder?.ref?.id;
-        if (id != null) {
-          final docReminder = FirebaseFirestore.instance
-              .collection('reminder_collection')
-              .doc(FirebaseAuth.instance.currentUser!.uid)
-              .collection('reminders')
-              .doc(id);
+    if (isEdit) {
+      if (formular["title"] != null && formular["title"] != "") {
+        if (formular["end_date"]!.isAfter(formular["begin_date"])) {
+          String? id = reminder?.ref?.id;
+          const successSnackBar = SnackBar(
+            content: Text('Evenement sauvegardé'),
+            backgroundColor: Color.fromARGB(255, 83, 201, 87),
+            duration: Duration(seconds: 6),
+          );
 
-          final reminder = Reminder(
-              title: formular["title"],
-              startDate: formular["begin_date"],
-              endDate: formular["end_date"],
-              description: formular["description"],
-              reminder: formular["reminder"],
-              recurrence: formular["recurrence"],
-              background: formular["background_color"] ?? "FF4CAF50",
-              isAllDay: formular["all_day_long"]);
-
-          final json = reminder.toJson();
-
-          docReminder.update(json);
-
-          Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => const ToDoList(),
-          ));
-          // }
-        } else {
-          print("here");
-          try {
-            final listReminders = FirebaseFirestore.instance
+          if (id != null) {
+            final docReminder = FirebaseFirestore.instance
                 .collection('reminder_collection')
                 .doc(FirebaseAuth.instance.currentUser!.uid)
-                .collection('reminders');
+                .collection('reminders')
+                .doc(id);
 
             final reminder = Reminder(
                 title: formular["title"],
@@ -405,30 +377,76 @@ class _FormPageState extends State<FormPage> {
                 description: formular["description"],
                 reminder: formular["reminder"],
                 recurrence: formular["recurrence"],
-                background: formular["background_color"] ?? "FF4CAF50",
+                background: formular["background_color"] ?? "FFF44336",
                 isAllDay: formular["all_day_long"]);
 
             final json = reminder.toJson();
-            await listReminders.add(json);
-            Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => const ToDoList(),
-            ));
-          } on FirebaseAuthException catch (e) {
-            print("err");
-            setState(() {
-              errMsg = e.message.toString();
-            });
+
+            docReminder.update(json);
+
+            // ignore: use_build_context_synchronously
+            ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+            // ignore: use_build_context_synchronously
+            context.go('/');
+            // }
+          } else {
+            try {
+              final listReminders = FirebaseFirestore.instance
+                  .collection('reminder_collection')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .collection('reminders');
+
+              final reminder = Reminder(
+                  title: formular["title"],
+                  startDate: formular["begin_date"],
+                  endDate: formular["end_date"],
+                  description: formular["description"],
+                  reminder: formular["reminder"],
+                  recurrence: formular["recurrence"],
+                  background: formular["background_color"] ?? "FF4CAF50",
+                  isAllDay: formular["all_day_long"]);
+
+              final json = reminder.toJson();
+              await listReminders.add(json);
+
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+              // ignore: use_build_context_synchronously
+              context.go('/');
+            } on FirebaseAuthException catch (e) {
+              final errSnackBar = SnackBar(
+                content: Text('Erreur : ${e.message}'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 6),
+              );
+
+              // ignore: use_build_context_synchronously
+              ScaffoldMessenger.of(context).showSnackBar(errSnackBar);
+            }
           }
+        } else {
+          const errSnackBar = SnackBar(
+            content: Text(
+                "Sélectionnez une date de début antérieur à la date de fin"),
+            backgroundColor: Colors.red,
+            duration: Duration(seconds: 6),
+          );
+
+          // ignore: use_build_context_synchronously
+          ScaffoldMessenger.of(context).showSnackBar(errSnackBar);
         }
       } else {
-        setState(() {
-          errMsg = "Sélectionnez une date de début antérieur à la date de fin";
-        });
+        const errSnackBar = SnackBar(
+          content: Text('Sélectionnez un titre'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 6),
+        );
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(errSnackBar);
       }
     } else {
-      setState(() {
-        errMsg = "Sélectionnez un titre";
-      });
+      Navigator.of(context).pop();
     }
   }
 

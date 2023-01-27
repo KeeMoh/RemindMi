@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:remind_mi/pages/form_page.dart';
+import 'package:remind_mi/pages/todo_list_page.dart';
 import 'package:remind_mi/utils/charter.dart';
 
 class AddReminderFloatingButton extends StatelessWidget {
@@ -12,9 +13,8 @@ class AddReminderFloatingButton extends StatelessWidget {
       backgroundColor: Charter.secondarycolor,
       foregroundColor: Charter.primarycolor,
       onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(builder: (context) => const FormPage()),
-        );
+        Navigator.of(context).push(MaterialPageRoute(
+            fullscreenDialog: false, builder: (context) => const FormPage()));
       },
       child: const Icon(Icons.add),
     );

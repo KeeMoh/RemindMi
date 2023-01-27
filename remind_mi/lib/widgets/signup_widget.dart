@@ -2,6 +2,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:remind_mi/app.dart';
 
 class SignUpWidget extends StatefulWidget {
@@ -21,7 +22,6 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   final confirmePasswordController = TextEditingController();
-  String? errMsg = '';
 
   @override
   void dispose() {
@@ -98,14 +98,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                   ? 'Vos mots de passes doivent être identiques'
                   : null),
             ),
-            const SizedBox(height: 30),
-            Text(errMsg!,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.red)),
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
             ElevatedButton(
               onPressed: signUp,
               style: ElevatedButton.styleFrom(
@@ -162,16 +155,38 @@ class _SignUpWidgetState extends State<SignUpWidget> {
           email: emailController.text.trim(),
           password: passwordController.text.trim(),
         );
+
+        const successSnackBar = SnackBar(
+          content: Text('Connexion réussite'),
+          backgroundColor: Color.fromARGB(255, 83, 201, 87),
+          duration: Duration(seconds: 6),
+        );
+
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+
+        // ignore: use_build_context_synchronously
+        context.go("/");
       } on FirebaseAuthException catch (e) {
         print(e);
+
+        final errSnackBar = SnackBar(
+          content: Text('Erreur : ${e.message}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 6),
+        );
 
         setState(() {
           passwordController.text = "";
           confirmePasswordController.text = "";
-          errMsg = e.message;
         });
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
       }
-      navigatorKey.currentState!.popUntil((route) => route.isFirst);
+      // navigatorKey.currentState!.popUntil((route) => route.isFirst);
     }
   }
 }

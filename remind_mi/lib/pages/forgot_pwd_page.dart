@@ -1,6 +1,7 @@
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -12,7 +13,6 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final formKey = GlobalKey<FormState>();
   final emailController = TextEditingController();
-  String? errMsg = '';
 
   @override
   void dispose() {
@@ -65,16 +65,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           ? 'Utilisez un email valide'
                           : null),
                 ),
-                const SizedBox(height: 20),
-                Text(errMsg!,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red)),
-                const SizedBox(height: 20),
+                const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: resetPwd,
+                  onPressed: () {
+                    resetPwd();
+                  },
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size.fromHeight(50),
                   ),
@@ -94,30 +89,45 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 ),
               ],
             )),
-      )
-  );
+      ));
 
   Future resetPwd() async {
     final isValid = formKey.currentState!.validate();
     if (!isValid) {
     } else {
       showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (context) =>
-                const Center(child: CircularProgressIndicator()));
+          context: context,
+          barrierDismissible: false,
+          builder: (context) =>
+              const Center(child: CircularProgressIndicator()));
       try {
         await FirebaseAuth.instance
             .sendPasswordResetEmail(email: emailController.text.trim());
-        // Utils.showSnackBar('Email de réinitialisation de mot de passe envoyé');
+
+        final successSnackBar = SnackBar(
+          content:
+              Text('Un email a été envoyé à ${emailController.text.trim()}'),
+          backgroundColor: const Color.fromARGB(255, 83, 201, 87),
+          duration: const Duration(seconds: 6),
+        );
+
         // ignore: use_build_context_synchronously
-        Navigator.of(context).popUntil((route) => route.isFirst);
+        ScaffoldMessenger.of(context).showSnackBar(successSnackBar);
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context);
+        // ignore: use_build_context_synchronously
+        context.go('/');
       } on FirebaseAuthException catch (e) {
-        setState(() {
-          errMsg = e.message;
-        });
+        final errSnackBar = SnackBar(
+          content: Text('Erreur : ${e.message}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 6),
+        );
+
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(errSnackBar);
         // Utils.showSnackBar(e.message);
-        Navigator.of(context).pop();
+        Navigator.pop(context);
       }
     }
   }
