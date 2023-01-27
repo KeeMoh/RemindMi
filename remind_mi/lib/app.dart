@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:remind_mi/pages/main_page.dart';
 import 'package:remind_mi/utils/charter.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -30,6 +31,8 @@ class RemindMiApp extends StatelessWidget {
       home: const MainPage(),
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
+      localizationsDelegates: const [GlobalMaterialLocalizations.delegate],
+      supportedLocales: const [Locale('en'), Locale('fr')],
     );
   }
 }

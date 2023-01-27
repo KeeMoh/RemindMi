@@ -14,7 +14,9 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class FormPage extends StatefulWidget {
   final Reminder? reminder;
-  const FormPage({super.key, this.reminder});
+  final DateTime? beginDate;
+  final DateTime? endDate;
+  const FormPage({super.key, this.reminder, this.beginDate, this.endDate});
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -23,6 +25,7 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final formKey = GlobalKey<FormBuilderState>();
   final user = FirebaseAuth.instance.currentUser!;
+  String errMsg = '';
   // Reminder? reminder;
   bool isAllDay = false;
   List<String> availableColors = [
@@ -37,21 +40,15 @@ class _FormPageState extends State<FormPage> {
   ];
   // final String _backgroundColor = "FFFFEB3B";
 
-  // void init() async {
-  //   print("init form 1 : " + widget.reminder.toString());
-  //   if (widget.reminder != null) {
-  //     print("init form 2 : " + widget.reminder.toString());
-  //     final reminder = await readReminder(widget.reminder!);
-  //     setState(() {
-  //       this.reminder = reminder;
-  //     });
-  //   }
-  // }
+  late DateTime valueBeginDate;
+  late DateTime valueEndDate;
 
   @override
   void initState() {
     super.initState();
-    // init();
+
+    valueBeginDate = validateBeginDate(widget.beginDate);
+    valueEndDate = validateEndDate(widget.endDate, valueBeginDate);
   }
 
   @override
@@ -127,8 +124,15 @@ class _FormPageState extends State<FormPage> {
                     ],
                   ),
                   FormBuilderDateTimePicker(
-                    initialValue: widget.reminder?.startDate ?? beginDate(),
+                    initialValue: valueBeginDate,
                     name: 'begin_date',
+                    locale: const Locale("fr", "FR"),
+                    onChanged: (value) {
+                      setState(() {
+                        valueBeginDate = value!;
+                        valueEndDate = validateEndDate(valueEndDate, value);
+                      });
+                    },
                     style: isAllDay
                         ? const TextStyle(
                             fontSize: 16,
@@ -149,8 +153,14 @@ class _FormPageState extends State<FormPage> {
                     ]),
                   ),
                   FormBuilderDateTimePicker(
-                    initialValue: widget.reminder?.endDate ?? endDate(),
+                    initialValue: valueEndDate,
                     name: 'end_date',
+                    locale: const Locale("fr", "FR"),
+                    onChanged: (value) {
+                      setState(() {
+                        valueEndDate = validateEndDate(value, valueBeginDate);
+                      });
+                    },
                     style: isAllDay
                         ? const TextStyle(
                             fontSize: 16,
@@ -294,14 +304,18 @@ class _FormPageState extends State<FormPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 20),
+                  Text(errMsg,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red)),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
                       await saveReminder(
                           formKey.currentState?.value, widget.reminder);
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const ToDoList(),
-                      ));
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
@@ -347,12 +361,91 @@ class _FormPageState extends State<FormPage> {
                 ]))));
   }
 
-  DateTime beginDate() {
-    return DateTime.now();
+  Future saveReminder(formular, reminder) async {
+    if (formular["title"] != null && formular["title"] != "") {
+      if (formular["end_date"]!.isAfter(formular["begin_date"])) {
+        String? id = reminder?.ref?.id;
+        if (id != null) {
+          final docReminder = FirebaseFirestore.instance
+              .collection('reminder_collection')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .collection('reminders')
+              .doc(id);
+
+          final reminder = Reminder(
+              title: formular["title"],
+              startDate: formular["begin_date"],
+              endDate: formular["end_date"],
+              description: formular["description"],
+              reminder: formular["reminder"],
+              recurrence: formular["recurrence"],
+              background: formular["background_color"] ?? "FF4CAF50",
+              isAllDay: formular["all_day_long"]);
+
+          final json = reminder.toJson();
+
+          docReminder.update(json);
+
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const ToDoList(),
+          ));
+          // }
+        } else {
+          print("here");
+          try {
+            final listReminders = FirebaseFirestore.instance
+                .collection('reminder_collection')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .collection('reminders');
+
+            final reminder = Reminder(
+                title: formular["title"],
+                startDate: formular["begin_date"],
+                endDate: formular["end_date"],
+                description: formular["description"],
+                reminder: formular["reminder"],
+                recurrence: formular["recurrence"],
+                background: formular["background_color"] ?? "FF4CAF50",
+                isAllDay: formular["all_day_long"]);
+
+            final json = reminder.toJson();
+            await listReminders.add(json);
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const ToDoList(),
+            ));
+          } on FirebaseAuthException catch (e) {
+            print("err");
+            setState(() {
+              errMsg = e.message.toString();
+            });
+          }
+        }
+      } else {
+        setState(() {
+          errMsg = "Sélectionnez une date de début antérieur à la date de fin";
+        });
+      }
+    } else {
+      setState(() {
+        errMsg = "Sélectionnez un titre";
+      });
+    }
   }
 
-  DateTime endDate() {
-    return DateTime.now().add(const Duration(hours: 2));
+  Future<Reminder?> readReminder(DocumentReference ref) async {
+    final docReminder = FirebaseFirestore.instance
+        .collection('reminder_collection')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('reminders')
+        .doc(ref.id);
+
+    final snapshot = await docReminder.get();
+
+    if (snapshot.exists) {
+      return Reminder.fromJson(snapshot.data()!, ref: snapshot.reference);
+    } else {
+      return null;
+    }
   }
 }
 
@@ -373,68 +466,148 @@ String getStringFromColor(dynamic color) {
   return "FFFCFCFC";
 }
 
-Future saveReminder(formular, reminder) async {
-  if (formular["title"] != null && formular["title"] != "") {
-    String? id = reminder?.ref?.id;
-    if (id != null) {
-      final docReminder = FirebaseFirestore.instance
-          .collection('reminder_collection')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection('reminders')
-          .doc(id);
-
-      final reminder = Reminder(
-          title: formular["title"],
-          startDate: formular["begin_date"],
-          endDate: formular["end_date"],
-          description: formular["description"],
-          reminder: formular["reminder"],
-          recurrence: formular["recurrence"],
-          background: formular["background_color"] ?? "FF4CAF50",
-          isAllDay: formular["all_day_long"]);
-
-      final json = reminder.toJson();
-
-      docReminder.update(json);
-// }
-    } else {
-      try {
-        final listReminders = FirebaseFirestore.instance
-            .collection('reminder_collection')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .collection('reminders');
-
-        final reminder = Reminder(
-            title: formular["title"],
-            startDate: formular["begin_date"],
-            endDate: formular["end_date"],
-            description: formular["description"],
-            reminder: formular["reminder"],
-            recurrence: formular["recurrence"],
-            background: formular["background_color"] ?? "FF4CAF50",
-            isAllDay: formular["all_day_long"]);
-
-        final json = reminder.toJson();
-        await listReminders.add(json);
-      } on FirebaseAuthException catch (e) {
-        print(e);
-      }
-    }
-  }
-}
-
-Future<Reminder?> readReminder(DocumentReference ref) async {
-  final docReminder = FirebaseFirestore.instance
-      .collection('reminder_collection')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .collection('reminders')
-      .doc(ref.id);
-
-  final snapshot = await docReminder.get();
-
-  if (snapshot.exists) {
-    return Reminder.fromJson(snapshot.data()!, ref: snapshot.reference);
+DateTime validateBeginDate(DateTime? beginDate) {
+  if (beginDate != null) {
+    return beginDate;
   } else {
-    return null;
+    return DateTime.now();
   }
 }
+
+DateTime validateEndDate(DateTime? endDate, DateTime valueBeginDate) {
+  if (endDate != null) {
+    if (endDate.isAfter(valueBeginDate)) {
+      return endDate;
+    } else {
+      return valueBeginDate.add(const Duration(hours: 1));
+    }
+  } else {
+    return valueBeginDate.add(const Duration(hours: 1));
+  }
+}
+
+
+
+/* TODO : Séparer heure et date
+
+FormBuilderDateTimePicker(
+                    initialValue: valueBeginDate,
+                    name: 'begin_date',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.date,
+                    // onChanged: (value) {
+                    //   setState(() {
+                    //     valueBeginDate = value!;
+                    //     valueEndDate = validateEndDate(valueEndDate, value);
+                    //   });
+                    // },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Date de début',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+                  FormBuilderDateTimePicker(
+                    initialValue: valueBeginDate,
+                    name: 'begin_time',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.time,
+                    // onChanged: (value) {
+                    //   setState(() {
+                    //     valueBeginDate = value!;
+                    //     valueEndDate = validateEndDate(valueEndDate, value);
+                    //   });
+                    // },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Heure de début',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+                  FormBuilderDateTimePicker(
+                    initialValue: valueEndDate,
+                    name: 'end_date',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.date,
+                    onChanged: (value) {
+                      setState(() {
+                        valueEndDate = validateEndDate(value, valueBeginDate);
+                      });
+                    },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Date de fin',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+                  FormBuilderDateTimePicker(
+                    initialValue: valueEndDate,
+                    name: 'end_time',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.time,
+                    onChanged: (value) {
+                      setState(() {
+                        valueEndDate = validateEndDate(value, valueBeginDate);
+                      });
+                    },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Heure de fin',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+
+
+*/
