@@ -8,11 +8,15 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:remind_mi/models/reminder.dart';
 import 'package:remind_mi/pages/todo_list_page.dart';
+import 'package:remind_mi/utils/charter.dart';
 import 'package:remind_mi/utils/hex_color.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class FormPage extends StatefulWidget {
   final Reminder? reminder;
-  const FormPage({super.key, this.reminder});
+  final DateTime? beginDate;
+  final DateTime? endDate;
+  const FormPage({super.key, this.reminder, this.beginDate, this.endDate});
 
   @override
   State<FormPage> createState() => _FormPageState();
@@ -21,6 +25,7 @@ class FormPage extends StatefulWidget {
 class _FormPageState extends State<FormPage> {
   final formKey = GlobalKey<FormBuilderState>();
   final user = FirebaseAuth.instance.currentUser!;
+  String errMsg = '';
   // Reminder? reminder;
   bool isAllDay = false;
   List<String> availableColors = [
@@ -33,26 +38,22 @@ class _FormPageState extends State<FormPage> {
     "FF9E9E9E",
     "FFFFEB3B"
   ];
+  // final String _backgroundColor = "FFFFEB3B";
 
-  // void init() async {
-  //   print("init form 1 : " + widget.reminder.toString());
-  //   if (widget.reminder != null) {
-  //     print("init form 2 : " + widget.reminder.toString());
-  //     final reminder = await readReminder(widget.reminder!);
-  //     setState(() {
-  //       this.reminder = reminder;
-  //     });
-  //   }
-  // }
+  late DateTime valueBeginDate;
+  late DateTime valueEndDate;
 
   @override
   void initState() {
     super.initState();
-    // init();
+
+    valueBeginDate = validateBeginDate(widget.beginDate);
+    valueEndDate = validateEndDate(widget.endDate, valueBeginDate);
   }
 
   @override
   Widget build(BuildContext context) {
+    Color _backgroundColor = Colors.red;
     return Scaffold(
         appBar: AppBar(
           title: const Text('Nouvel évènement'),
@@ -123,8 +124,15 @@ class _FormPageState extends State<FormPage> {
                     ],
                   ),
                   FormBuilderDateTimePicker(
-                    initialValue: widget.reminder?.startDate ?? beginDate(),
+                    initialValue: valueBeginDate,
                     name: 'begin_date',
+                    locale: const Locale("fr", "FR"),
+                    onChanged: (value) {
+                      setState(() {
+                        valueBeginDate = value!;
+                        valueEndDate = validateEndDate(valueEndDate, value);
+                      });
+                    },
                     style: isAllDay
                         ? const TextStyle(
                             fontSize: 16,
@@ -145,8 +153,14 @@ class _FormPageState extends State<FormPage> {
                     ]),
                   ),
                   FormBuilderDateTimePicker(
-                    initialValue: widget.reminder?.endDate ?? endDate(),
+                    initialValue: valueEndDate,
                     name: 'end_date',
+                    locale: const Locale("fr", "FR"),
+                    onChanged: (value) {
+                      setState(() {
+                        valueEndDate = validateEndDate(value, valueBeginDate);
+                      });
+                    },
                     style: isAllDay
                         ? const TextStyle(
                             fontSize: 16,
@@ -166,37 +180,142 @@ class _FormPageState extends State<FormPage> {
                       FormBuilderValidators.required(),
                     ]),
                   ),
-                  FormBuilderDropdown(
-                    iconSize: 40,
-                    decoration: const InputDecoration(
-                        labelText: 'Couleur de fond',
-                        labelStyle:
-                            TextStyle(color: Colors.white, fontSize: 16)),
-                    alignment: AlignmentDirectional.bottomEnd,
-                    name: "background_color",
-                    items: availableColors
-                        .map((e) => DropdownMenuItem(
-                            value: e,
-                            child: Container(
-                              height: 20,
-                              width: 20,
-                              decoration: BoxDecoration(
-                                  color: HexColor(e),
-                                  borderRadius: BorderRadius.circular(10)),
-                            )))
-                        .toList(),
-                    validator: FormBuilderValidators.compose([
-                      FormBuilderValidators.required(),
-                    ]),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Couleur de fond :",
+                          style: TextStyle(
+                              fontSize: 16,
+                              color: Color.fromRGBO(248, 228, 148, 1)),
+                        ),
+                        SizedBox(width: 20),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: FormBuilderField<String?>(
+                            name: 'background_color',
+                            builder: (FormFieldState field) {
+                              return Container(
+                                height: 35,
+                                width: 65,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20.0)),
+                                      backgroundColor: _backgroundColor),
+                                  onPressed: () {
+                                    showDialog(
+                                        context: context,
+                                        builder: (BuildContext context) {
+                                          return AlertDialog(
+                                            title: const Text(
+                                                "Choisissez une couleur"),
+                                            content: BlockPicker(
+                                                pickerColor:
+                                                    _backgroundColor, //default color
+                                                onColorChanged: (Color color) {
+                                                  _backgroundColor = color;
+                                                  field.didChange(
+                                                      getStringFromColor(
+                                                          color));
+                                                  Navigator.pop(context);
+                                                }),
+                                          );
+                                        });
+                                  },
+                                  child: const SizedBox(),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  Row(
+                    children: [
+                      const Text(
+                        "Récurrence :",
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                      ),
+                      SizedBox(width: 20),
+                      Expanded(
+                        child: FormBuilderDropdown(
+                          menuMaxHeight: 300,
+                          initialValue: "aucun",
+                          iconSize: 40,
+                          dropdownColor: Charter.primarycolor,
+                          // decoration: const InputDecoration(
+                          //     labelText: 'Couleur de fond',
+                          //     labelStyle:
+                          //         TextStyle(color: Colors.white, fontSize: 16)),
+                          // alignment: AlignmentDirectional.bottomEnd,
+                          name: "recurrence",
+                          items: [
+                            DropdownMenuItem(
+                              value: "aucun",
+                              child: Text(
+                                "aucun",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=DAILY;INTERVAL=1",
+                              child: Text(
+                                "quotidien",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=WEEKLY;INTERVAL=1",
+                              child: Text(
+                                "hebdomadaire",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=MONTHLY;INTERVAL=1",
+                              child: Text(
+                                "mensuel",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                            DropdownMenuItem(
+                              value: "FREQ=YEARLY;INTERVAL=1",
+                              child: Text(
+                                "annuel",
+                                style: TextStyle(
+                                    color: Charter.secondarycolor[500]),
+                              ),
+                            ),
+                          ],
+                          // validator: FormBuilderValidators.compose([
+                          //   FormBuilderValidators.required(),
+                          // ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                  Text(errMsg,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.red)),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
                       await saveReminder(
                           formKey.currentState?.value, widget.reminder);
-                      Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const ToDoList(),
-                      ));
                     },
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(50),
@@ -242,77 +361,253 @@ class _FormPageState extends State<FormPage> {
                 ]))));
   }
 
-  DateTime beginDate() {
-    return DateTime.now();
-  }
+  Future saveReminder(formular, reminder) async {
+    if (formular["title"] != null && formular["title"] != "") {
+      if (formular["end_date"]!.isAfter(formular["begin_date"])) {
+        String? id = reminder?.ref?.id;
+        if (id != null) {
+          final docReminder = FirebaseFirestore.instance
+              .collection('reminder_collection')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .collection('reminders')
+              .doc(id);
 
-  DateTime endDate() {
-    return DateTime.now().add(const Duration(hours: 2));
-  }
-}
+          final reminder = Reminder(
+              title: formular["title"],
+              startDate: formular["begin_date"],
+              endDate: formular["end_date"],
+              description: formular["description"],
+              reminder: formular["reminder"],
+              recurrence: formular["recurrence"],
+              background: formular["background_color"] ?? "FF4CAF50",
+              isAllDay: formular["all_day_long"]);
 
-Future saveReminder(formular, reminder) async {
-  if (formular["title"] != null && formular["title"] != "") {
-    String? id = reminder?.ref?.id;
-    if (id != null) {
-      final docReminder = FirebaseFirestore.instance
-          .collection('reminder_collection')
-          .doc(FirebaseAuth.instance.currentUser!.uid)
-          .collection('reminders')
-          .doc(id);
+          final json = reminder.toJson();
 
-      final reminder = Reminder(
-          title: formular["title"],
-          startDate: formular["begin_date"],
-          endDate: formular["end_date"],
-          description: formular["description"],
-          reminder: formular["reminder"],
-          recurrence: formular["recurrence"],
-          background: formular["background_color"] ?? "FF4CAF50",
-          isAllDay: formular["all_day_long"]);
+          docReminder.update(json);
 
-      final json = reminder.toJson();
+          Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => const ToDoList(),
+          ));
+          // }
+        } else {
+          print("here");
+          try {
+            final listReminders = FirebaseFirestore.instance
+                .collection('reminder_collection')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .collection('reminders');
 
-      docReminder.update(json);
-// }
-    } else {
-      try {
-        final listReminders = FirebaseFirestore.instance
-            .collection('reminder_collection')
-            .doc(FirebaseAuth.instance.currentUser!.uid)
-            .collection('reminders');
+            final reminder = Reminder(
+                title: formular["title"],
+                startDate: formular["begin_date"],
+                endDate: formular["end_date"],
+                description: formular["description"],
+                reminder: formular["reminder"],
+                recurrence: formular["recurrence"],
+                background: formular["background_color"] ?? "FF4CAF50",
+                isAllDay: formular["all_day_long"]);
 
-        final reminder = Reminder(
-            title: formular["title"],
-            startDate: formular["begin_date"],
-            endDate: formular["end_date"],
-            description: formular["description"],
-            reminder: formular["reminder"],
-            recurrence: formular["recurrence"],
-            background: formular["background_color"] ?? "FF4CAF50",
-            isAllDay: formular["all_day_long"]);
-
-        final json = reminder.toJson();
-        await listReminders.add(json);
-      } on FirebaseAuthException catch (e) {
-        print(e);
+            final json = reminder.toJson();
+            await listReminders.add(json);
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => const ToDoList(),
+            ));
+          } on FirebaseAuthException catch (e) {
+            print("err");
+            setState(() {
+              errMsg = e.message.toString();
+            });
+          }
+        }
+      } else {
+        setState(() {
+          errMsg = "Sélectionnez une date de début antérieur à la date de fin";
+        });
       }
+    } else {
+      setState(() {
+        errMsg = "Sélectionnez un titre";
+      });
+    }
+  }
+
+  Future<Reminder?> readReminder(DocumentReference ref) async {
+    final docReminder = FirebaseFirestore.instance
+        .collection('reminder_collection')
+        .doc(FirebaseAuth.instance.currentUser!.uid)
+        .collection('reminders')
+        .doc(ref.id);
+
+    final snapshot = await docReminder.get();
+
+    if (snapshot.exists) {
+      return Reminder.fromJson(snapshot.data()!, ref: snapshot.reference);
+    } else {
+      return null;
     }
   }
 }
 
-Future<Reminder?> readReminder(DocumentReference ref) async {
-  final docReminder = FirebaseFirestore.instance
-      .collection('reminder_collection')
-      .doc(FirebaseAuth.instance.currentUser!.uid)
-      .collection('reminders')
-      .doc(ref.id);
+String getStringFromColor(dynamic color) {
+  print(color);
+  if (color.runtimeType == MaterialColor) {
+    return color
+        .toString()
+        .substring(color.toString().length - 10, color.toString().length - 2)
+        .toUpperCase();
+  }
+  if (color.runtimeType == Color) {
+    return color
+        .toString()
+        .substring(color.toString().length - 9, color.toString().length - 1)
+        .toUpperCase();
+  }
+  return "FFFCFCFC";
+}
 
-  final snapshot = await docReminder.get();
-
-  if (snapshot.exists) {
-    return Reminder.fromJson(snapshot.data()!, ref: snapshot.reference);
+DateTime validateBeginDate(DateTime? beginDate) {
+  if (beginDate != null) {
+    return beginDate;
   } else {
-    return null;
+    return DateTime.now();
   }
 }
+
+DateTime validateEndDate(DateTime? endDate, DateTime valueBeginDate) {
+  if (endDate != null) {
+    if (endDate.isAfter(valueBeginDate)) {
+      return endDate;
+    } else {
+      return valueBeginDate.add(const Duration(hours: 1));
+    }
+  } else {
+    return valueBeginDate.add(const Duration(hours: 1));
+  }
+}
+
+
+
+/* TODO : Séparer heure et date
+
+FormBuilderDateTimePicker(
+                    initialValue: valueBeginDate,
+                    name: 'begin_date',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.date,
+                    // onChanged: (value) {
+                    //   setState(() {
+                    //     valueBeginDate = value!;
+                    //     valueEndDate = validateEndDate(valueEndDate, value);
+                    //   });
+                    // },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Date de début',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+                  FormBuilderDateTimePicker(
+                    initialValue: valueBeginDate,
+                    name: 'begin_time',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.time,
+                    // onChanged: (value) {
+                    //   setState(() {
+                    //     valueBeginDate = value!;
+                    //     valueEndDate = validateEndDate(valueEndDate, value);
+                    //   });
+                    // },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Heure de début',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+                  FormBuilderDateTimePicker(
+                    initialValue: valueEndDate,
+                    name: 'end_date',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.date,
+                    onChanged: (value) {
+                      setState(() {
+                        valueEndDate = validateEndDate(value, valueBeginDate);
+                      });
+                    },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Date de fin',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+                  FormBuilderDateTimePicker(
+                    initialValue: valueEndDate,
+                    name: 'end_time',
+                    locale: const Locale("fr", "FR"),
+                    inputType: InputType.time,
+                    onChanged: (value) {
+                      setState(() {
+                        valueEndDate = validateEndDate(value, valueBeginDate);
+                      });
+                    },
+                    style: isAllDay
+                        ? const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 0.2))
+                        : const TextStyle(
+                            fontSize: 16,
+                            color: Color.fromRGBO(248, 228, 148, 1)),
+                    enabled: !isAllDay,
+                    decoration: InputDecoration(
+                      labelText: 'Heure de fin',
+                      labelStyle: isAllDay
+                          ? const TextStyle(
+                              color: Color.fromRGBO(248, 228, 148, 0.2))
+                          : const TextStyle(color: Colors.white),
+                    ),
+                    validator: FormBuilderValidators.compose([
+                      FormBuilderValidators.required(),
+                    ]),
+                  ),
+
+
+*/

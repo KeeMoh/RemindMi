@@ -30,7 +30,9 @@ class _ReminderWidgetState extends State<ReminderWidget> {
                       child: SizedBox(
                           width: 50,
                           child: Center(
-                              child: Text(getTimeBeforeReminder(element)))),
+                              child: Text(
+                                  textAlign: TextAlign.center,
+                                  getTimeBeforeReminder(element)))),
                     ),
                     Expanded(
                         child: GestureDetector(
@@ -87,6 +89,7 @@ class _ReminderWidgetState extends State<ReminderWidget> {
 
   @override
   Widget build(BuildContext context) {
+    reminders.sort((a, b) => a.startDate.compareTo(b.startDate));
     return ListView(
       children: cardsWidget,
     );
